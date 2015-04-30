@@ -230,6 +230,8 @@ public class Twitter
 			int statusCount = int.Parse (CleanJSONString (baseRawTweet.Split(new string[] { "\"statuses_count\":" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(',')[0]));
 			bool verified = bool.Parse (CleanJSONString (baseRawTweet.Split(new string[] { "\"verified\":" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(',')[0]));
 
+			DateTime createdAt = DateTime.ParseExact (CleanJSONString (baseRawTweet.Split(new string[] { "\"created_at\":" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(',')[0].Replace ("\"", "")), "ddd MMM dd HH:mm:ss zzz yyyy", CultureInfo.InvariantCulture);
+
 			int favourites = 0;
 
 			if (baseRawTweet.Contains ("\"favorite_count\":"))
@@ -241,6 +243,7 @@ public class Twitter
 				retweets = int.Parse (CleanJSONString (baseRawTweet.Split(new string[] { "\"retweet_count\":" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(',')[0]));
 
 			tweets[i - 1] = new Tweet(id, text, new TwitterUser(userID, userName, name, followersCount, friendsCount, listedCount, userFavourites, statusCount, verified), favourites, retweets);
+			tweets[i - 1].createdAt = createdAt;
 		}
 		
 		return tweets;
