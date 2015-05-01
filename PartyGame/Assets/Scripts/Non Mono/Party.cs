@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class Party
@@ -13,6 +14,8 @@ public class Party
 	public int count = 0;
 
 	public GameObject prefab;
+
+	public List<GameObject> mps = new List<GameObject>();
 
 	public Party(string name)
 	{

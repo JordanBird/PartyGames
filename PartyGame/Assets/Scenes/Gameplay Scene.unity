@@ -3155,6 +3155,46 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2fdbb89093e2cf04d82a6455ebcd2680, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &451011771
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 451011772}
+  - 114: {fileID: 451011773}
+  m_Layer: 0
+  m_Name: Wave Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &451011772
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 451011771}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: .346534729, y: 30.2934151, z: -1.75574493}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1058318813}
+  m_RootOrder: 3
+--- !u!114 &451011773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 451011771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d2ca482e44a675458ee3b6984ca24e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameManager: {fileID: 0}
 --- !u!1 &452132870
 GameObject:
   m_ObjectHideFlags: 0
@@ -5502,13 +5542,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   twitterManager: {fileID: 0}
+  partyManager: {fileID: 0}
+  waveManager: {fileID: 0}
   dynamicObjectHolder: {fileID: 0}
-  conservativePrefab: {fileID: 178768, guid: 0fa7982b48ba31a42b6230a211de14fd, type: 2}
-  greenPrefab: {fileID: 132448, guid: 2fdbb89093e2cf04d82a6455ebcd2680, type: 2}
-  labourPrefab: {fileID: 166062, guid: 87bb72518c4fb6c44869011e68fe5ec6, type: 2}
-  libDemPrefab: {fileID: 103796, guid: 5cf6c684593df314b91ce8f00783ac7a, type: 2}
-  ukipPrefab: {fileID: 118440, guid: 1736073541ec8ff41937c9a36087eb59, type: 2}
-  parties: []
 --- !u!1 &1028246451
 GameObject:
   m_ObjectHideFlags: 0
@@ -5675,6 +5711,8 @@ Transform:
   m_Children:
   - {fileID: 1018010616}
   - {fileID: 1762950063}
+  - {fileID: 2083791218}
+  - {fileID: 451011772}
   m_Father: {fileID: 0}
   m_RootOrder: 3
 --- !u!1 &1059871810
@@ -10330,7 +10368,7 @@ GameObject:
   - 4: {fileID: 1762950063}
   - 114: {fileID: 1762950062}
   m_Layer: 0
-  m_Name: TwitterManager
+  m_Name: Twitter Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11411,6 +11449,52 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2035934859}
   m_Mesh: {fileID: 4300014, guid: 4de9ee24290213e42b39d316751929ea, type: 3}
+--- !u!1 &2083791217
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 2083791218}
+  - 114: {fileID: 2083791219}
+  m_Layer: 0
+  m_Name: Party Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2083791218
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2083791217}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1058318813}
+  m_RootOrder: 2
+--- !u!114 &2083791219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2083791217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df964f3fac3cefd4eae8733a3788aebc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  twitterManager: {fileID: 0}
+  conservativePrefab: {fileID: 178768, guid: 0fa7982b48ba31a42b6230a211de14fd, type: 2}
+  greenPrefab: {fileID: 132448, guid: 2fdbb89093e2cf04d82a6455ebcd2680, type: 2}
+  labourPrefab: {fileID: 166062, guid: 87bb72518c4fb6c44869011e68fe5ec6, type: 2}
+  libDemPrefab: {fileID: 103796, guid: 5cf6c684593df314b91ce8f00783ac7a, type: 2}
+  ukipPrefab: {fileID: 118440, guid: 1736073541ec8ff41937c9a36087eb59, type: 2}
+  parties: []
 --- !u!1001 &2090412478
 Prefab:
   m_ObjectHideFlags: 0
