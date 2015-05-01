@@ -17,8 +17,8 @@ public class PunchedDamage : MonoBehaviour {
 
 	void OnCollisionEnter(Collision other){
 		if (other.transform.tag == "Fist" && other.gameObject.GetComponent<PunchForce>().Party != Party) {
-			Debug.Log (Party+other.gameObject.GetComponent<PunchForce>().Party);
-				Parent.GetComponent<MP_Control> ().Health -= 30;
+//			Debug.Log (Party+other.gameObject.GetComponent<PunchForce>().Party);
+				Parent.GetComponent<MP_Control> ().Punch(30);
 
 
 		}
