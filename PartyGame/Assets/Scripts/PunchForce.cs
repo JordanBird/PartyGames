@@ -26,6 +26,7 @@ public class PunchForce : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
+		Rb.AddForce (Vector3.up * 100);
 		PunchDelay += 1 * Time.deltaTime;
 	
 		if (PunchDelay >= Random.Range(1.0f,6.0f)) {

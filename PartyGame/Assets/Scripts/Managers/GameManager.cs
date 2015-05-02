@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
 	public PartyManager partyManager;
 	public WaveManager waveManager;
 
+	public GUIM_MainGame guimMainGame;
+
 	public GameObject dynamicObjectHolder;
 
 	// Use this for initialization
@@ -18,10 +20,16 @@ public class GameManager : MonoBehaviour
 		partyManager = FindObjectOfType<PartyManager> ();
 		waveManager = FindObjectOfType<WaveManager> ();
 
-		dynamicObjectHolder = new GameObject ("Dynamic Object Holder");
+		guimMainGame = FindObjectOfType<GUIM_MainGame> ();
+
+		dynamicObjectHolder = GameObject.Find("Dynamic Objects");
+
+		if (dynamicObjectHolder == null)
+			dynamicObjectHolder = new GameObject ("Dynamic Objects");
 
 		//Jordan Says: Scraping here might be good for more data and key words: http://www.bbc.co.uk/news/election/2015/manifesto-guide
 
+		//Launch the Game
 		StartGame ();
 	}
 	
@@ -33,6 +41,6 @@ public class GameManager : MonoBehaviour
 
 	private void StartGame()
 	{
-		waveManager.SpawnWave ();
+		waveManager.StartWave ();
 	}
 }

@@ -4,13 +4,16 @@ using System.Collections.Generic;
 
 public class PartyManager : MonoBehaviour
 {
-	public TwitterManager twitterManager;
+	public GameManager gameManager;
 
 	public GameObject conservativePrefab;
 	public GameObject greenPrefab;
 	public GameObject labourPrefab;
 	public GameObject libDemPrefab;
 	public GameObject ukipPrefab;
+
+	public GameObject deathEffect;
+	public GameObject[] hitEffects;
 
 	public Party[] parties;
 
@@ -19,6 +22,8 @@ public class PartyManager : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		gameManager = FindObjectOfType<GameManager> ();
+
 		Party conservative = new Party ("Conservative", Color.blue, null, new string[] { "David Cameron" }, conservativePrefab);
 		Party green = new Party ("Green", Color.green, null, new string[] { "Natalie Bennett" }, greenPrefab);
 		Party labour = new Party ("Labour", Color.red, null, new string[] { "Ed Miliband", }, labourPrefab);
@@ -27,6 +32,9 @@ public class PartyManager : MonoBehaviour
 
 		//Populate parties array with created parties.
 		parties = new Party[] { conservative, green, labour, libDems, ukip };
+
+		//Instantiate the GUI
+		gameManager.guimMainGame.SetPartyScoringObjects (parties);
 	}
 	
 	// Update is called once per frame
@@ -34,9 +42,9 @@ public class PartyManager : MonoBehaviour
 	
 	}
 
-	public void SpawnMPs(PartyTweetData[] partyRelatedTweets)
+	public void SpawnMPs()
 	{
-		for (int i = 0; i < partyRelatedTweets.Length; i++)
+		for (int i = 0; i < partyRelatedTweets.Count; i++)
 		{
 			SpawnMP (partyRelatedTweets[i].party);
 		}
@@ -44,6 +52,8 @@ public class PartyManager : MonoBehaviour
 
 	public void PopulatePartiesWithCount(Tweet[] tweets)
 	{
+		partyRelatedTweets.Clear ();
+
 		for (int i = 0; i < tweets.Length; i++)
 		{
 			foreach (Party party in parties)
@@ -90,9 +100,53 @@ public class PartyManager : MonoBehaviour
 		}
 		
 		GameObject mp = Instantiate (party.prefab, position, Quaternion.identity) as GameObject;
+		mp.transform.parent = gameManager.dynamicObjectHolder.transform;
 
 		party.mps.Add (mp);
 
+		//Update GUI
+		gameManager.guimMainGame.UpdateScoreCard (party);
+
 		return mp;
+	}
+
+	public void RemoveMPFromParty(GameObject mp)
+	{
+		int partiesWithRemainingMPs = 0;
+
+		foreach (Party p in parties)
+		{
+			p.mps.Remove (mp);
+
+			if (p.mps.Count > 0)
+				partiesWithRemainingMPs++;
+
+			GameObject death = Instantiate (deathEffect, mp.transform.FindChild ("HeadTarget").transform.position, Quaternion.identity) as GameObject;
+			death.transform.SetParent (gameManager.dynamicObjectHolder.transform);
+
+			//Update GUI
+			gameManager.guimMainGame.UpdateScoreCard (p);
+		}
+
+		if (partiesWithRemainingMPs < 2)
+		{
+			gameManager.waveManager.EndWave ();
+			gameManager.waveManager.StartWave ();
+		}
+	}
+
+	public void SpawnHitMarker(string party, Vector3 position)
+	{
+		foreach (Party p in parties)
+		{
+			if (party == p.name)
+			{
+				if (hitEffects.Length > 0)
+				{
+					GameObject g = Instantiate(hitEffects[Random.Range (0, hitEffects.Length)], position, Quaternion.identity) as GameObject;
+					g.GetComponent<Renderer>().material.color = p.colour;
+				}
+			}
+		}
 	}
 }

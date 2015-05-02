@@ -17,6 +17,8 @@ public class Party
 
 	public List<GameObject> mps = new List<GameObject>();
 
+	public int winCount = 0;
+
 	public Party(string name)
 	{
 		this.name = name;

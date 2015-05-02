@@ -13,14 +13,15 @@ using System.Net.Security;
 
 public class Twitter
 {
+	static string oauthconsumerkey = "mR3rH2JIVQJgFSfreMh0eF4zA";
+	static string oauthtoken = "20883292-eEIzdZiAllqgVoew2ruOoNgaeZiXc4ZvD88etfDlg";
+	static string oauthconsumersecret = "HZeUauA45bPDIdHzYqGsUYlClgt05iLs9RqGHUnEQwL14yPo8C";
+	static string oauthtokensecret = "tQfVpbOJfl6oxN1jkCnz8CAQN6UcMF9FDDx4KIZzIuZ9M";
+
 	static public void Verify_Credentials()
 	{
-		string oauthconsumerkey = "mR3rH2JIVQJgFSfreMh0eF4zA";
-		string oauthconsumersecret = "HZeUauA45bPDIdHzYqGsUYlClgt05iLs9RqGHUnEQwL14yPo8C";
 		string oauthsignaturemethod = "HMAC-SHA1";
 		string oauthversion = "1.0";
-		string oauthtoken = "20883292-eEIzdZiAllqgVoew2ruOoNgaeZiXc4ZvD88etfDlg";
-		string oauthtokensecret = "tQfVpbOJfl6oxN1jkCnz8CAQN6UcMF9FDDx4KIZzIuZ9M";
 		string oauthnonce = Convert.ToBase64String(new ASCIIEncoding().GetBytes(DateTime.Now.Ticks.ToString()));
 		TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 		string oauthtimestamp = Convert.ToInt64(ts.TotalSeconds).ToString();
@@ -105,10 +106,6 @@ public class Twitter
 		searchTerm = System.Uri.EscapeDataString(searchTerm);
 		
 		string url = "https://api.twitter.com/1.1/search/tweets.json?result_type=recent&include_entities=false&count=100&lang=en&q=" + searchTerm;
-		string oauthconsumerkey = "mR3rH2JIVQJgFSfreMh0eF4zA";
-		string oauthtoken = "20883292-eEIzdZiAllqgVoew2ruOoNgaeZiXc4ZvD88etfDlg";
-		string oauthconsumersecret = "HZeUauA45bPDIdHzYqGsUYlClgt05iLs9RqGHUnEQwL14yPo8C";
-		string oauthtokensecret = "tQfVpbOJfl6oxN1jkCnz8CAQN6UcMF9FDDx4KIZzIuZ9M";
 		string oauthsignaturemethod = "HMAC-SHA1";
 		string oauthversion = "1.0";
 		string oauthnonce = Convert.ToBase64String(new ASCIIEncoding().GetBytes(DateTime.Now.Ticks.ToString()));
@@ -209,6 +206,9 @@ public class Twitter
 		string[] rawTweets = searchResults.Split(new string[] { "\"metadata\"" }, StringSplitOptions.RemoveEmptyEntries);
 		Debug.Log (rawTweets.Length);
 		Debug.Log (rawTweets.Length - 1);
+
+		if (rawTweets.Length == 0)
+			return new Tweet[0];
 
 		Tweet[] tweets = new Tweet[rawTweets.Length - 1];
 
