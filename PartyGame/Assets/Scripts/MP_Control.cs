@@ -5,9 +5,13 @@ public class MP_Control : MonoBehaviour
 {
 	public string Party;
 	private float Health = 100;
-	// Use this for initialization
-	void Start () {
 
+	private PunchForce[] punchForces;
+
+	// Use this for initialization
+	void Start ()
+	{
+		punchForces = GetComponentsInChildren<PunchForce> ();
 	}
 	
 	// Update is called once per frame
@@ -39,5 +43,13 @@ public class MP_Control : MonoBehaviour
 
 		Destroy (this.gameObject);
 		// Maybe put increment a total of what ever party just got killed.
+	}
+
+	public void Order()
+	{
+		foreach (PunchForce pf in punchForces)
+		{
+			pf.Order();
+		}
 	}
 }

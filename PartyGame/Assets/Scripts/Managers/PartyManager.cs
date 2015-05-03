@@ -38,8 +38,9 @@ public class PartyManager : MonoBehaviour
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void Update ()
+	{
+
 	}
 
 	public void SpawnMPs()
@@ -123,12 +124,13 @@ public class PartyManager : MonoBehaviour
 
 			GameObject death = Instantiate (deathEffect, mp.transform.FindChild ("HeadTarget").transform.position, Quaternion.identity) as GameObject;
 			death.transform.SetParent (gameManager.dynamicObjectHolder.transform);
+			death.GetComponent<ParticleSystem>().startColor = GetParty (mp.GetComponent<MP_Control>().Party).colour;
 
 			//Update GUI
 			gameManager.guimMainGame.UpdateScoreCard (p);
 		}
 
-		if (partiesWithRemainingMPs < 2)
+		if (partiesWithRemainingMPs < 2 && gameManager.waveManager.waveInProgress)
 		{
 			gameManager.waveManager.EndWave ();
 			gameManager.waveManager.StartWave ();
@@ -146,6 +148,28 @@ public class PartyManager : MonoBehaviour
 					GameObject g = Instantiate(hitEffects[Random.Range (0, hitEffects.Length)], position, Quaternion.identity) as GameObject;
 					g.GetComponent<Renderer>().material.color = p.colour;
 				}
+			}
+		}
+	}
+
+	public Party GetParty(string party)
+	{
+		foreach (Party p in parties)
+		{
+			if (p.name.ToUpper() == party.ToUpper ())
+				return p;
+		}
+
+		return null;
+	}
+
+	public void ACTION_Order()
+	{
+		foreach (Party p in parties)
+		{
+			foreach (GameObject mp in p.mps)
+			{
+				mp.GetComponent<MP_Control>().Order ();
 			}
 		}
 	}

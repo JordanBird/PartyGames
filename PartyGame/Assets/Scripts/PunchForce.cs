@@ -26,7 +26,7 @@ public class PunchForce : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
-		Rb.AddForce (Vector3.up * 100);
+		Rb.AddForce (Vector3.up * 50);
 		PunchDelay += 1 * Time.deltaTime;
 	
 		if (PunchDelay >= Random.Range(1.0f,6.0f)) {
@@ -64,18 +64,23 @@ public class PunchForce : MonoBehaviour {
 				//Dis = Target.transform.position.magnitude;
 				//Dir = Head / Dis;
 				//Rb.AddForce (Dir * 50500);
-				Rb.AddForce((Target.transform.position - transform.position).normalized * 10000);
+				Rb.AddForce((Target.transform.position - transform.position).normalized * 20000);
 				PunchDelay = 0;
 			}
 		}
 
-		if (Input.GetKeyDown (KeyCode.Space)) {
+//		if (Input.GetKeyDown (KeyCode.Space)) {
+//
+//			//Head = Home.transform.position - transform.position;
+//			//Dis = Home.transform.position.magnitude;
+//			//Dir = Head / Dis;
+//			//Rb.AddForce (Dir * 50500);
+//			Rb.AddForce((Home.transform.position - transform.position).normalized * 30000);
+//		}
+	}
 
-			//Head = Home.transform.position - transform.position;
-			//Dis = Home.transform.position.magnitude;
-			//Dir = Head / Dis;
-			//Rb.AddForce (Dir * 50500);
-			Rb.AddForce((Home.transform.position - transform.position).normalized * 30000);
-		}
+	public void Order()
+	{
+		Rb.AddForce((Home.transform.position - transform.position).normalized * 30000);
 	}
 }

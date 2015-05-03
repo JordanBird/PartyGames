@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class WaveManager : MonoBehaviour
 {
@@ -14,10 +15,28 @@ public class WaveManager : MonoBehaviour
 
 	public bool waveInProgress = false;
 
+	public static string userTweets = "#TestParty";
+	public static string electionHashtag = "#GE2015";
+
+	public List<UserAction> userActions = new List<UserAction>();
+
 	// Use this for initialization
 	void Start ()
 	{
 		gameManager = FindObjectOfType<GameManager> ();
+
+		if (PlayerPrefs.HasKey ("Election Hashtag"))
+			electionHashtag = PlayerPrefs.GetString ("Election Hashtag");
+		else
+			PlayerPrefs.SetString ("Election Hashtag", electionHashtag);
+
+		//Add User Actions to List
+		UserAction order = new UserAction ("Order", UserOrder);
+		userActions.Add (order);
+
+		//Setup Times
+		lastScannedTweet = System.DateTime.Now;
+		highestThisRunthough = System.DateTime.Now;
 	}
 	
 	// Update is called once per frame
@@ -26,7 +45,11 @@ public class WaveManager : MonoBehaviour
 		if (waveInProgress)
 		{
 			timeLeft -= Time.deltaTime;
-			
+
+			//UpdateGUI
+			System.TimeSpan span = System.TimeSpan.FromSeconds (timeLeft);
+			gameManager.guimMainGame.UpdateTimeLeft (span.Minutes.ToString ("D2") + ":" + span.Seconds.ToString ("D2"));
+
 			if (timeLeft <= 0)
 			{
 				Timeout ();
@@ -38,7 +61,7 @@ public class WaveManager : MonoBehaviour
 	public void StartWave()
 	{
 		//This is where you specify the search term for the tweets you want. Result type can be 'new', 'popular' or 'mixed'.
-		StartCoroutine (GetTweets(gameManager.twitterManager.CreateSearchUserWWW ("#GE2015", "new"))); //TODO: Add hashtag selection via PlayerPrefs and GUI.
+		StartCoroutine (GetTweets(gameManager.twitterManager.CreateSearchUserWWW (electionHashtag, "new")));
 		StartCoroutine (SearchForUserTweets ());
 	}
 
@@ -48,10 +71,14 @@ public class WaveManager : MonoBehaviour
 		timeLeft = timeLimit;
 		waveInProgress = true;
 
+		//UpdateGUI
+		gameManager.guimMainGame.UpdateWaveNumber (wave.ToString ());
+
 		gameManager.partyManager.PopulatePartiesWithCount(Twitter.ParseSearchResults (tweets));
 		gameManager.partyManager.SpawnMPs ();
 
 		StartCoroutine (DEBUG_SimulateUserTweets ());
+		StartCoroutine (SearchForUserTweets());
 	}
 
 	public void EndWave()
@@ -80,8 +107,13 @@ public class WaveManager : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Called when time runs out for a wave. Clears all MPs.
+	/// </summary>
 	public void Timeout()
 	{
+		waveInProgress = false;
+
 		foreach (Party p in gameManager.partyManager.parties)
 		{
 			if (p.mps.Count > 0)
@@ -96,6 +128,11 @@ public class WaveManager : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Deal with the election tweets and spawn a wave based on those tweets.
+	/// </summary>
+	/// <returns>The tweets.</returns>
+	/// <param name="www">Www.</param>
 	private IEnumerator GetTweets(WWW www)
 	{
 		yield return www;
@@ -116,6 +153,11 @@ public class WaveManager : MonoBehaviour
 		SpawnWave (parseValue);
 	}
 
+	/// <summary>
+	/// Deal with the tweets found from searching the user hashtag.
+	/// </summary>
+	/// <returns>The user tweets.</returns>
+	/// <param name="www">Www.</param>
 	private IEnumerator GetUserTweets(WWW www)
 	{
 		yield return www;
@@ -135,7 +177,7 @@ public class WaveManager : MonoBehaviour
 		//Success
 		Tweet[] foundTweets = Twitter.ParseSearchResults (parseValue);
 		
-		highestThisRunthough = new System.DateTime (1970, 1, 1);
+		highestThisRunthough = lastScannedTweet;
 		
 		for (int i = 0; i < foundTweets.Length; i++)
 		{
@@ -168,6 +210,12 @@ public class WaveManager : MonoBehaviour
 					}
 				}
 			}
+
+			foreach (UserAction action in userActions)
+			{
+				if (foundTweets[i].text.ToUpper ().Contains(action.name.ToUpper ()))
+				    action.runAction();
+			}
 		}
 		
 		lastScannedTweet = highestThisRunthough;
@@ -188,15 +236,23 @@ public class WaveManager : MonoBehaviour
 		gameManager.guimMainGame.UpdateScoreCard (party);
 	}
 
+	/// <summary>
+	/// Searches for user tweets.
+	/// </summary>
+	/// <returns>The for user tweets.</returns>
 	IEnumerator SearchForUserTweets()
 	{
 		while (waveInProgress)
 		{
-			StartCoroutine (GetUserTweets(gameManager.twitterManager.CreateSearchUserWWW ("#TESTPARTY", "new")));
-			yield return new WaitForSeconds(30);
+			StartCoroutine (GetUserTweets(gameManager.twitterManager.CreateSearchUserWWW (userTweets, "new")));
+			yield return new WaitForSeconds(8);
 		}
 	}
 
+	/// <summary>
+	/// Simulates users tweeting to the user hashtag.
+	/// </summary>
+	/// <returns>The g_ simulate user tweets.</returns>
 	public IEnumerator DEBUG_SimulateUserTweets()
 	{
 		while (waveInProgress)
@@ -213,6 +269,10 @@ public class WaveManager : MonoBehaviour
 
 			yield return new WaitForSeconds(30);
 		}
+	}
 
+	public void UserOrder()
+	{
+		gameManager.partyManager.ACTION_Order ();
 	}
 }

@@ -57,4 +57,14 @@ public class GUIM_MainGame : MonoBehaviour
 			}
 		}
 	}
+
+	public void UpdateTimeLeft(string timeLeft)
+	{
+		mainGameCanvas.transform.FindChild ("Text - Wave Timer").GetComponent<Text> ().text = timeLeft + " Left";
+	}
+
+	public void UpdateWaveNumber(string wave)
+	{
+		mainGameCanvas.transform.FindChild ("Text - Wave #").GetComponent<Text> ().text = "Wave: " + wave;
+	}
 }
