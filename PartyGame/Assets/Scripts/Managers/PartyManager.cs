@@ -11,6 +11,8 @@ public class PartyManager : MonoBehaviour
 	public GameObject labourPrefab;
 	public GameObject libDemPrefab;
 	public GameObject ukipPrefab;
+	public GameObject snpPrefab;
+	public GameObject plaidPrefab;
 
 	public GameObject deathEffect;
 	public GameObject[] hitEffects;
@@ -24,14 +26,16 @@ public class PartyManager : MonoBehaviour
 	{
 		gameManager = FindObjectOfType<GameManager> ();
 
-		Party conservative = new Party ("Conservative", Color.blue, null, new string[] { "David Cameron" }, conservativePrefab);
-		Party green = new Party ("Green", Color.green, null, new string[] { "Natalie Bennett" }, greenPrefab);
-		Party labour = new Party ("Labour", Color.red, null, new string[] { "Ed Miliband", }, labourPrefab);
+		Party conservative = new Party ("Conservative", new Color(0, 0.5294117647f, 0.86274509803f), null, new string[] { "David Cameron" }, conservativePrefab);
+		Party green = new Party ("Green", new Color(0.41568627451f, 0.69019607843f, 0.13725490196f), null, new string[] { "Natalie Bennett" }, greenPrefab);
+		Party labour = new Party ("Labour", new Color(0.86274509803f, 0.14117647058f, 0.12156862745f), null, new string[] { "Ed Miliband", }, labourPrefab);
 		Party libDems = new Party ("LibDem", new Color(1, 0.49803921568f, 0), new string[] { "Lib Dems", "Lib Dem" }, new string[] { "Nick Clegg" }, libDemPrefab);
 		Party ukip = new Party ("Ukip", new Color(0.50196078431f, 0, 0.50196078431f), new string[] { "UK Independance Party" }, new string[] { "Nigel Farage" }, ukipPrefab);
+		Party snp = new Party ("SNP", new Color(1, 1, 0), new string[] { "Scottish National Party" }, new string[] { "Alex Salmond", "Nicola Sturgeon" }, snpPrefab);
+		Party plaid = new Party ("Plaid", new Color(0, 0.50588235294f, 0.25882352941f), new string[] { "Plaid Cymru" }, new string[] { "Leanne Wood" }, plaidPrefab);
 
 		//Populate parties array with created parties.
-		parties = new Party[] { conservative, green, labour, libDems, ukip };
+		parties = new Party[] { conservative, green, labour, libDems, ukip, snp, plaid };
 
 		//Instantiate the GUI
 		gameManager.guimMainGame.SetPartyScoringObjects (parties);

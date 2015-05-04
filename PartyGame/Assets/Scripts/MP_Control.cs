@@ -5,7 +5,7 @@ public class MP_Control : MonoBehaviour
 {
 	public string Party;
 	private float Health = 100;
-	public float HitsPerSecond { get; private set; }
+	public float HitsPerSecond { get; set; }
 
 	private PunchForce[] punchForces;
 
@@ -25,8 +25,6 @@ public class MP_Control : MonoBehaviour
 
 	public void DealDamage(float amount)
 	{
-		++HitsPerSecond;
-	
 		Health -= amount;
 
 		if (Health <= 0)
@@ -56,6 +54,14 @@ public class MP_Control : MonoBehaviour
 		foreach (PunchForce pf in punchForces)
 		{
 			pf.Order();
+		}
+	}
+
+	public void AddForce(Vector3 force)
+	{
+		foreach (PunchForce pf in punchForces)
+		{
+			pf.AddForce (force);
 		}
 	}
 }

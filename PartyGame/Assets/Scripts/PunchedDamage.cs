@@ -20,6 +20,7 @@ public class PunchedDamage : MonoBehaviour {
 		{
 			Debug.Log (Party+other.gameObject.GetComponent<PunchForce>().Party);
 			Parent.GetComponent<MP_Control> ().DealDamage (30);
+			Parent.GetComponent<MP_Control> ().HitsPerSecond++;
 
 			//Spawn a hit marker.
 			FindObjectOfType<PartyManager>().SpawnHitMarker (Party, other.contacts[0].point);

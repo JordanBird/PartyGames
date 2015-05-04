@@ -83,4 +83,9 @@ public class PunchForce : MonoBehaviour {
 	{
 		Rb.AddForce((Home.transform.position - transform.position).normalized * 30000);
 	}
+
+	public void AddForce(Vector3 force)
+	{
+		Rb.AddForce (force);
+	}
 }

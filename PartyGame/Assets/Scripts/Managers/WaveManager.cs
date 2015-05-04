@@ -245,7 +245,7 @@ public class WaveManager : MonoBehaviour
 		while (waveInProgress)
 		{
 			StartCoroutine (GetUserTweets(gameManager.twitterManager.CreateSearchUserWWW (userTweets, "new")));
-			yield return new WaitForSeconds(8);
+			yield return new WaitForSeconds(13);
 		}
 	}
 

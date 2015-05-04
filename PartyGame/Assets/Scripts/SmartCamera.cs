@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class SmartCamera : MonoBehaviour
 {
+	public GameManager gameManager;
+
 	private Camera camera;
 	
 	#region Orbiting
@@ -44,14 +46,22 @@ public class SmartCamera : MonoBehaviour
 	public float ShakeAmplitudeScale;
 	public float ShakeSpeedScale;
 	#endregion
-	
+
+	public Vector3 percentageCentre = Vector3.zero;
+
 	void Awake()
 	{
 		camera = GetComponent<Camera>();
 		currentFocusFOV = lastFocusFOV = FocusFOVMax;
 		focusFollowDuration = FocusFollowDurationMax;
 	}
-	
+
+	void Start()
+	{
+		gameManager = FindObjectOfType<GameManager> ();
+		StartCoroutine (PercentageCentre ());
+	}
+
 	void Update()
 	{
 		Orbit ();
@@ -70,7 +80,7 @@ public class SmartCamera : MonoBehaviour
 	{
 		// Check if the object focused on has been destroyed.
 		if (focused && focus == null)
-			SetFocus (null);
+			SetFocus (percentageCentre);
 
 		if (AutoFocus)
 		{
@@ -87,7 +97,10 @@ public class SmartCamera : MonoBehaviour
 		if (focusChangeTimer >= focusChangeDuration)
 		{
 			// Aim at focus.
-			currentFocusPosition = focused ? focus.position : FocusDefaultPosition;
+			if (focus != null)
+				currentFocusPosition = focused ? focus.position : FocusDefaultPosition;
+			else
+				focused = false;
 
 			if (FocusFollowSmoothness > 0)
 			{
@@ -104,11 +117,15 @@ public class SmartCamera : MonoBehaviour
 			focusChangeTimer += Time.deltaTime;
 			if (focusChangeTimer > focusChangeDuration)
 				focusChangeTimer = focusChangeDuration;
-			
+
 			float interpolation = Mathf.SmoothStep (0.0f, 1.0f, focusChangeTimer / focusChangeDuration);
 			
 			// Look at the intermediate position between the last focus position and the new focus.
-			currentFocusPosition = Vector3.Lerp (lastFocusPosition, focused ? focus.position : FocusDefaultPosition, interpolation);
+			if (focus != null)
+				currentFocusPosition = Vector3.Lerp (lastFocusPosition, focused ? focus.position : FocusDefaultPosition, interpolation);
+			else
+				focused = false;
+
 			transform.LookAt(currentFocusPosition);
 
 			if (focused)
@@ -156,7 +173,22 @@ public class SmartCamera : MonoBehaviour
 		this.focus = focus;
 
 	}
-	
+
+	public void SetFocus(Vector3 focus)
+	{
+		lastFocusPosition = currentFocusPosition;
+		lastFocusFOV = currentFocusFOV;
+		
+		// Get the time it should take to change aim.
+		float angle = Vector3.Angle (transform.forward, (focused ? focus : FocusDefaultPosition) - transform.position);
+		focusChangeTimer = 0.0f;
+		focusChangeDuration = focused ? angle / 90.0f * FocusChangeSmoothness : FocusChangeSmoothness * 0.5f;
+		
+		// Reset the follow timer.
+		focusFollowTimer = 0.0f;
+		focusFollowDuration = Random.Range (FocusFollowDurationMin, FocusFollowDurationMax);
+	}
+
 	void DetermineFocus()
 	{
 		GameManager gm = FindObjectOfType<GameManager>();
@@ -201,7 +233,7 @@ public class SmartCamera : MonoBehaviour
 		// If nothing specifically interesting is going on, just focus at the average position.
 		if (totalInterest / numMPs < AutoFocusInterestThreshold)
 		{
-			SetFocus (null);
+			SetFocus (percentageCentre);
 		}
 		else
 		{
@@ -232,5 +264,128 @@ public class SmartCamera : MonoBehaviour
 		}
 	}
 	
-	
+	IEnumerator PercentageCentre()
+	{
+		while (true)
+		{
+			List<PositionCount> xPositionCounts = new List<PositionCount>();
+			List<PositionCount> yPositionCounts = new List<PositionCount>();
+			List<PositionCount> zPositionCounts = new List<PositionCount>();
+
+			if (gameManager.partyManager == null)
+			{
+				yield return null;
+				continue;
+			}
+
+			foreach (Party p in gameManager.partyManager.parties)
+			{
+				foreach (GameObject g in p.mps)
+				{
+					int x = Mathf.RoundToInt (g.transform.FindChild ("HeadTarget").transform.position.x);
+					int y = Mathf.RoundToInt (g.transform.FindChild ("HeadTarget").transform.position.y);
+					int z = Mathf.RoundToInt (g.transform.FindChild ("HeadTarget").transform.position.z);
+
+					if (xPositionCounts.Count == 0)
+						xPositionCounts.Add (new PositionCount(x, 1));
+
+					for (int i = 0; i < xPositionCounts.Count; i++)
+					{
+						if (xPositionCounts[i].coordinate == x)
+							xPositionCounts[i].count++;
+						else if (i == xPositionCounts.Count - 1)
+							xPositionCounts.Add (new PositionCount(x, 1));
+					}
+
+					if (yPositionCounts.Count == 0)
+						yPositionCounts.Add (new PositionCount(y, 1));
+
+					for (int i = 0; i < yPositionCounts.Count; i++)
+					{
+						if (yPositionCounts[i].coordinate == y)
+							yPositionCounts[i].count++;
+						else if (i == yPositionCounts.Count - 1)
+							yPositionCounts.Add (new PositionCount(y, 1));
+					}
+
+					if (zPositionCounts.Count == 0)
+						zPositionCounts.Add (new PositionCount(z, 1));
+
+					for (int i = 0; i < zPositionCounts.Count; i++)
+					{
+						if (zPositionCounts[i].coordinate == z)
+							zPositionCounts[i].count++;
+						else if (i == zPositionCounts.Count - 1)
+							zPositionCounts.Add (new PositionCount(z, 1));
+					}
+				}
+			}
+
+			if (xPositionCounts.Count == 0)
+			{
+				yield return null;
+				continue;
+			}
+
+			Vector3 centre = Vector3.zero;
+
+			int count = 0;
+			int index = 0;
+
+			for (int i = 0; i < xPositionCounts.Count; i++)
+			{
+				if (xPositionCounts[i].count > count)
+				{
+					count = xPositionCounts[i].count;
+					index = i;
+				}
+			}
+
+			centre.x = xPositionCounts[index].coordinate;
+			count = 0;
+			index = 0;
+
+			for (int i = 0; i < yPositionCounts.Count; i++)
+			{
+				if (yPositionCounts[i].count > count)
+				{
+					count = yPositionCounts[i].count;
+					index = i;
+				}
+			}
+			
+			centre.y = yPositionCounts[index].coordinate;
+			count = 0;
+			index = 0;
+
+			for (int i = 0; i < zPositionCounts.Count; i++)
+			{
+				if (zPositionCounts[i].count > count)
+				{
+					count = zPositionCounts[i].count;
+					index = i;
+				}
+			}
+			
+			centre.z = zPositionCounts[index].coordinate;
+			count = 0;
+			index = 0;
+
+			percentageCentre = centre;
+
+			yield return new WaitForSeconds(1);
+		}
+	}
+}
+
+public class PositionCount
+{
+	public int coordinate = 0;
+	public int count = 0;
+
+	public PositionCount(int coordinate, int count)
+	{
+		this.coordinate = coordinate;
+		this.count = count;
+	}
 }
