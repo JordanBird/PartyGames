@@ -5,6 +5,7 @@ public class MP_Control : MonoBehaviour
 {
 	public string Party;
 	private float Health = 100;
+	public float HitsPerSecond { get; private set; }
 
 	private PunchForce[] punchForces;
 
@@ -15,12 +16,17 @@ public class MP_Control : MonoBehaviour
 	}
 	
 	// Update is called once per frame
-	void Update () {
-
+	void Update ()
+	{
+		HitsPerSecond -= Time.deltaTime;
+		if (HitsPerSecond < 0)
+			HitsPerSecond = 0;
 	}
 
 	public void DealDamage(float amount)
 	{
+		++HitsPerSecond;
+	
 		Health -= amount;
 
 		if (Health <= 0)
