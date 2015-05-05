@@ -200,4 +200,39 @@ public class GUIM_MainGame : MonoBehaviour
 	{
 		mainGameCanvas.transform.FindChild ("Text - Wave #").GetComponent<Text> ().text = "Wave: " + wave;
 	}
+
+	public IEnumerator FlashPartyColour(Party party)
+	{
+		Text text = null;
+		foreach (GameObject g in partyScores)
+		{
+			if (g.name == "Party Score: " + party.name)
+			{
+				text = g.transform.FindChild ("Text - Party").GetComponent<Text> ();
+				text.text = text.text + "++";
+				text.color = party.colour;
+				break;
+			}
+		}
+
+		if (text != null)
+		{
+			bool changing = true;
+			float progress = 0;
+			
+			while (changing)
+			{
+				progress += 0.005f;
+				
+				text.color = Color.Lerp (text.color, Color.white, progress);
+
+				if (text.color == Color.white)
+					changing = false;
+
+				yield return new WaitForSeconds(0.05f);
+			}
+		}
+
+		text.text = text.text.Replace ("++", "");
+	}
 }

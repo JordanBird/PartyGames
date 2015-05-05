@@ -149,6 +149,7 @@ GameObject:
   - 4: {fileID: 479100}
   - 54: {fileID: 5490716}
   - 65: {fileID: 6570614}
+  - 135: {fileID: 13518620}
   m_Layer: 0
   m_Name: Hip
   m_TagString: Untagged
@@ -255,7 +256,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 179632}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: .707106829, z: 0, w: .707106709}
   m_LocalPosition: {x: 0, y: 15, z: 0}
   m_LocalScale: {x: 50, y: 50, z: 50}
   m_Children:
@@ -758,7 +759,7 @@ BoxCollider:
   m_GameObject: {fileID: 165732}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: -.0199999996, y: .0199999996, z: -.0199999996}
   m_Center: {x: 0, y: -.0199999996, z: 0}
@@ -848,6 +849,18 @@ MonoBehaviour:
   Home: {fileID: 0}
   Party: 
   TarParty: 
+--- !u!135 &13518620
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 165732}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: .0199999996
+  m_Center: {x: 0, y: -.0149999997, z: 0}
 --- !u!135 &13561468
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -868,7 +881,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 196780}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: .00500000129
   m_Height: .0125703169
   m_Direction: 1
@@ -907,7 +920,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 123980}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: .00500000268
   m_Height: .0125703197
   m_Direction: 1
@@ -920,7 +933,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 190614}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: .0058581694
   m_Height: .0150000062
   m_Direction: 1
@@ -933,7 +946,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 151864}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: .00585816754
   m_Height: .0150000034
   m_Direction: 1

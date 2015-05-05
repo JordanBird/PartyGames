@@ -189,14 +189,20 @@ public class WaveManager : MonoBehaviour
 			foreach (Party party in gameManager.partyManager.parties)
 			{
 				if (foundTweets[i].text.ToUpper ().Contains(party.name.ToUpper ()))
+				{
 					SpawnUserMP (party);
-				
+					break;
+				}
+
 				if (party.nameVariations != null)
 				{
 					foreach (string s in party.nameVariations)
 					{
 						if (foundTweets[i].text.ToUpper ().Contains(s.ToUpper ()))
+						{
 							SpawnUserMP (party);
+							break;
+						}
 					}
 				}
 				
@@ -205,7 +211,10 @@ public class WaveManager : MonoBehaviour
 					foreach (string s in party.keywords)
 					{
 						if (foundTweets[i].text.ToUpper ().Contains(s.ToUpper ()))
+						{
 							SpawnUserMP (party);
+							break;
+						}
 					}
 				}
 			}
@@ -228,11 +237,12 @@ public class WaveManager : MonoBehaviour
 	{
 		GameObject mp = gameManager.partyManager.SpawnMP (party);
 
-		mp.transform.localScale = new Vector3 (1.5f, 1.5f, 1.5f);
+		mp.transform.localScale = new Vector3 (65f, 65f, 65f);
 		mp.GetComponent<MP_Control> ().SetHealth (150);
 
 		//Update GUI
 		gameManager.guimMainGame.UpdateScoreCard (party);
+		StartCoroutine (gameManager.guimMainGame.FlashPartyColour (party));
 	}
 
 	/// <summary>

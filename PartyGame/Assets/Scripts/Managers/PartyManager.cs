@@ -171,7 +171,7 @@ public class PartyManager : MonoBehaviour
 			position = new Vector3(x, y, z);
 		}
 		
-		GameObject mp = Instantiate (mpPrefab, position, Quaternion.identity) as GameObject;
+		GameObject mp = Instantiate (mpPrefab, position, mpPrefab.transform.rotation) as GameObject;
 		mp.GetComponent<MP_Control> ().Party = party.name;
 		mp.GetComponentInChildren<PunchedDamage>().Party = party.name;
 
@@ -207,10 +207,13 @@ public class PartyManager : MonoBehaviour
 			if (p.mps.Count > 0)
 				partiesWithRemainingMPs++;
 
-			GameObject death = Instantiate (deathEffect, mp.transform.FindChild ("HeadTarget").transform.position, Quaternion.identity) as GameObject;
-			death.transform.SetParent (gameManager.dynamicObjectHolder.transform);
-			death.GetComponent<ParticleSystem>().startColor = GetParty (mp.GetComponent<MP_Control>().Party).colour;
-
+			try
+			{
+				GameObject death = Instantiate (deathEffect, mp.transform.FindChild ("HeadTarget").transform.position, Quaternion.identity) as GameObject;
+				death.transform.SetParent (gameManager.dynamicObjectHolder.transform);
+				death.GetComponent<ParticleSystem>().startColor = GetParty (mp.GetComponent<MP_Control>().Party).colour;
+			}
+			catch {}
 			//Update GUI
 			gameManager.guimMainGame.UpdateScoreCard (p);
 		}
@@ -252,9 +255,13 @@ public class PartyManager : MonoBehaviour
 	{
 		foreach (Party p in parties)
 		{
-			foreach (GameObject mp in p.mps)
+			for (int i = 0; i < p.mps.Count; i++)
 			{
-				mp.GetComponent<MP_Control>().Order ();
+				if (p.mps[i] != null)
+				{
+					//Home.transform.position - transform.position).normalized * 30000
+					p.mps[i].GetComponent<MP_Control>().AddForce ((p.seats[Random.Range (0, p.seats.Count)].transform.position - transform.position).normalized * 30000);
+				}
 			}
 		}
 	}
