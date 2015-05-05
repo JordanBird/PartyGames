@@ -110,14 +110,16 @@ public class GUIM_MainGame : MonoBehaviour
 	{
 		partyScores = new GameObject[parties.Length];
 
+		float height = mainGameCanvas.pixelRect.height;
+
 		for (int i = 0; i < parties.Length; i++)
 		{
 			//Spawn
 			GameObject panel = Instantiate (partyScoringPrefab, Vector3.zero, Quaternion.identity) as GameObject;
-			panel.transform.SetParent (mainGameCanvas.transform, false);
+			panel.transform.SetParent (mainGameCanvas.transform.FindChild ("Party Scores").transform, false);
 
 			//Position
-			panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(45, -45 + (i * -70));
+			panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0 + (i * -(height / (parties.Length + 1))));
 
 			//Customise
 			panel.transform.FindChild ("Image - Party Colour").GetComponent<Image>().color = parties[i].colour;
@@ -125,6 +127,20 @@ public class GUIM_MainGame : MonoBehaviour
 			panel.transform.FindChild ("Text - Wave Wins").GetComponent<Text>().text = "0";
 			panel.transform.FindChild ("Text - Party").GetComponent<Text>().text = parties[i].name;
 			panel.name = "Party Score: " + parties[i].name;
+
+			RectTransform t = panel.GetComponent<RectTransform>();
+			RectTransform pt = panel.transform.parent.GetComponent<RectTransform>();
+			
+			if(t == null || pt == null) return;
+			
+			Vector2 newAnchorsMin = new Vector2(t.anchorMin.x + t.offsetMin.x / pt.rect.width,
+			                                    t.anchorMin.y + t.offsetMin.y / pt.rect.height);
+			Vector2 newAnchorsMax = new Vector2(t.anchorMax.x + t.offsetMax.x / pt.rect.width,
+			                                    t.anchorMax.y + t.offsetMax.y / pt.rect.height);
+			
+			t.anchorMin = newAnchorsMin;
+			t.anchorMax = newAnchorsMax;
+			t.offsetMin = t.offsetMax = new Vector2(0, 0);
 
 			partyScores[i] = panel;
 		}
