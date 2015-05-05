@@ -20,20 +20,20 @@ public class SmartCamera : MonoBehaviour
 	private Vector3 lastFocusPosition;
 	private Vector3 currentFocusPosition;
 	public Vector3 FocusDefaultPosition;
-	
+
 	private float focusFollowTimer;
 	private float focusFollowDuration;
 	public  float FocusFollowDurationMin, FocusFollowDurationMax;
 	public float FocusFollowSmoothness;
-	
+
 	private float focusChangeTimer;
 	private float focusChangeDuration;
 	public float FocusChangeSmoothness;
-	
+
 	private float lastFocusFOV;
 	private float currentFocusFOV;
 	public float FocusFOVMin, FocusFOVMax;
-	
+
 	public bool AutoFocus;
 	public float AutoFocusInterestThreshold;
 	#endregion
@@ -49,19 +49,19 @@ public class SmartCamera : MonoBehaviour
 
 	public Vector3 percentageCentre = Vector3.zero;
 
-	void Start()
-	{
-		gameManager = FindObjectOfType<GameManager> ();
-		StartCoroutine (PercentageCentre ());
-	}
-
 	void Awake()
 	{
 		camera = GetComponent<Camera>();
 		currentFocusFOV = lastFocusFOV = FocusFOVMax;
 		focusFollowDuration = FocusFollowDurationMax;
 	}
-	
+
+	void Start()
+	{
+		gameManager = FindObjectOfType<GameManager> ();
+		StartCoroutine (PercentageCentre ());
+	}
+
 	void Update()
 	{
 		Orbit ();
@@ -80,8 +80,8 @@ public class SmartCamera : MonoBehaviour
 	{
 		// Check if the object focused on has been destroyed.
 		if (focused && focus == null)
-			SetFocus (null);
-		
+			DetermineFocus();
+
 		if (AutoFocus)
 		{
 			// Change focus if the follow timer has finished.
@@ -92,13 +92,13 @@ public class SmartCamera : MonoBehaviour
 				DetermineFocus();
 			}
 		}
-		
+
 		// If the change timer has ended, follow the focus smoothly.
 		if (focusChangeTimer >= focusChangeDuration)
 		{
 			// Aim at focus.
 			currentFocusPosition = focused ? focus.position : FocusDefaultPosition;
-			
+
 			if (FocusFollowSmoothness > 0)
 			{
 				Quaternion targetLook = Quaternion.LookRotation(currentFocusPosition - transform.position);
@@ -114,13 +114,14 @@ public class SmartCamera : MonoBehaviour
 			focusChangeTimer += Time.deltaTime;
 			if (focusChangeTimer > focusChangeDuration)
 				focusChangeTimer = focusChangeDuration;
-			
-			float interpolation = Mathf.SmoothStep (0.0f, 1.0f, focusChangeTimer / focusChangeDuration * 2);
+
+			float interpolation = Mathf.SmoothStep (0.0f, 1.0f, focusChangeTimer / focusChangeDuration);
 			
 			// Look at the intermediate position between the last focus position and the new focus.
 			currentFocusPosition = Vector3.Lerp (lastFocusPosition, focused ? focus.position : FocusDefaultPosition, interpolation);
+
 			transform.LookAt(currentFocusPosition);
-			
+
 			if (focused)
 			{
 				// Zoom out then in.  The maximum zoomed out is scaled by the angle between focal points.
@@ -131,7 +132,7 @@ public class SmartCamera : MonoBehaviour
 				// Zoom out.
 				currentFocusFOV = Mathf.Lerp (lastFocusFOV, FocusFOVMax, interpolation);
 			}
-			
+
 			camera.fieldOfView = currentFocusFOV; 
 		}
 	}
@@ -150,27 +151,27 @@ public class SmartCamera : MonoBehaviour
 	public void SetFocus(Transform focus)
 	{ 
 		focused = focus != null;
-		
+
 		lastFocusPosition = currentFocusPosition;
 		lastFocusFOV = currentFocusFOV;
-		
+			
 		// Get the time it should take to change aim.
 		float angle = Vector3.Angle (transform.forward, (focused ? focus.position : FocusDefaultPosition) - transform.position);
 		focusChangeTimer = 0.0f;
 		focusChangeDuration = focused ? angle / 90.0f * FocusChangeSmoothness : FocusChangeSmoothness * 0.5f;
-		
+
 		// Reset the follow timer.
 		focusFollowTimer = 0.0f;
 		focusFollowDuration = Random.Range (FocusFollowDurationMin, FocusFollowDurationMax);
 		
 		this.focus = focus;
-		
+
 	}
-	
+
 	void DetermineFocus()
 	{
 		GameManager gm = FindObjectOfType<GameManager>();
-		
+
 		// Copy the list of mps to a new array so that any changes to the list after yielding do not cause errors.
 		// Get the most interesting position by getting the average position of hit mps but multiplying the positions by their HitsPerSecond cubed to shift the average position towards them.
 		Vector3 mostInterestingPosition = Vector3.zero;
@@ -180,16 +181,16 @@ public class SmartCamera : MonoBehaviour
 		foreach (Party p in gm.partyManager.parties)
 		{
 			numMPs += p.mps.Count;
-			
+
 			// Access the mps through a normal for loop since the number of mps could change after yielding.
 			for (int i = 0; i < p.mps.Count; ++i)
 			{
 				if (p.mps[i] != null)
 				{
 					averagePosition += p.mps[i].transform.position;
-					
+
 					MP_Control mpControl = p.mps[i].GetComponent<MP_Control>();
-					
+
 					// If the mp has not been hit recently, ignore it.
 					if (mpControl.HitsPerSecond != 0)
 					{
@@ -200,15 +201,14 @@ public class SmartCamera : MonoBehaviour
 				}
 			}
 		}
-		
+
 		// Rescale the average positions.
 		mostInterestingPosition /= totalInterest;
 		averagePosition /= numMPs;
 		FocusDefaultPosition = averagePosition;
-		FocusDefaultPosition = percentageCentre;
 
 		Debug.Log ("Num MPS: " + numMPs + " | Interest: " + totalInterest);
-		
+
 		// If nothing specifically interesting is going on, just focus at the average position.
 		if (totalInterest / numMPs < AutoFocusInterestThreshold)
 		{
@@ -238,10 +238,11 @@ public class SmartCamera : MonoBehaviour
 					}
 				}
 			}
-			
+
 			SetFocus (bestMP == null ? bestMP : bestMP.Find ("HeadTarget"));
 		}
 	}
+	
 	IEnumerator PercentageCentre()
 	{
 		while (true)
@@ -249,13 +250,13 @@ public class SmartCamera : MonoBehaviour
 			List<PositionCount> xPositionCounts = new List<PositionCount>();
 			List<PositionCount> yPositionCounts = new List<PositionCount>();
 			List<PositionCount> zPositionCounts = new List<PositionCount>();
-			
+
 			if (gameManager.partyManager == null)
 			{
 				yield return null;
 				continue;
 			}
-			
+
 			foreach (Party p in gameManager.partyManager.parties)
 			{
 				foreach (GameObject g in p.mps)
@@ -263,10 +264,10 @@ public class SmartCamera : MonoBehaviour
 					int x = Mathf.RoundToInt (g.transform.FindChild ("HeadTarget").transform.position.x);
 					int y = Mathf.RoundToInt (g.transform.FindChild ("HeadTarget").transform.position.y);
 					int z = Mathf.RoundToInt (g.transform.FindChild ("HeadTarget").transform.position.z);
-					
+
 					if (xPositionCounts.Count == 0)
 						xPositionCounts.Add (new PositionCount(x, 1));
-					
+
 					for (int i = 0; i < xPositionCounts.Count; i++)
 					{
 						if (xPositionCounts[i].coordinate == x)
@@ -274,10 +275,10 @@ public class SmartCamera : MonoBehaviour
 						else if (i == xPositionCounts.Count - 1)
 							xPositionCounts.Add (new PositionCount(x, 1));
 					}
-					
+
 					if (yPositionCounts.Count == 0)
 						yPositionCounts.Add (new PositionCount(y, 1));
-					
+
 					for (int i = 0; i < yPositionCounts.Count; i++)
 					{
 						if (yPositionCounts[i].coordinate == y)
@@ -285,10 +286,10 @@ public class SmartCamera : MonoBehaviour
 						else if (i == yPositionCounts.Count - 1)
 							yPositionCounts.Add (new PositionCount(y, 1));
 					}
-					
+
 					if (zPositionCounts.Count == 0)
 						zPositionCounts.Add (new PositionCount(z, 1));
-					
+
 					for (int i = 0; i < zPositionCounts.Count; i++)
 					{
 						if (zPositionCounts[i].coordinate == z)
@@ -298,18 +299,18 @@ public class SmartCamera : MonoBehaviour
 					}
 				}
 			}
-			
+
 			if (xPositionCounts.Count == 0)
 			{
 				yield return null;
 				continue;
 			}
-			
+
 			Vector3 centre = Vector3.zero;
-			
+
 			int count = 0;
 			int index = 0;
-			
+
 			for (int i = 0; i < xPositionCounts.Count; i++)
 			{
 				if (xPositionCounts[i].count > count)
@@ -318,11 +319,11 @@ public class SmartCamera : MonoBehaviour
 					index = i;
 				}
 			}
-			
+
 			centre.x = xPositionCounts[index].coordinate;
 			count = 0;
 			index = 0;
-			
+
 			for (int i = 0; i < yPositionCounts.Count; i++)
 			{
 				if (yPositionCounts[i].count > count)
@@ -335,7 +336,7 @@ public class SmartCamera : MonoBehaviour
 			centre.y = yPositionCounts[index].coordinate;
 			count = 0;
 			index = 0;
-			
+
 			for (int i = 0; i < zPositionCounts.Count; i++)
 			{
 				if (zPositionCounts[i].count > count)
@@ -348,9 +349,9 @@ public class SmartCamera : MonoBehaviour
 			centre.z = zPositionCounts[index].coordinate;
 			count = 0;
 			index = 0;
-			
+
 			percentageCentre = centre;
-			
+
 			yield return new WaitForSeconds(1);
 		}
 	}
@@ -360,7 +361,7 @@ public class PositionCount
 {
 	public int coordinate = 0;
 	public int count = 0;
-	
+
 	public PositionCount(int coordinate, int count)
 	{
 		this.coordinate = coordinate;

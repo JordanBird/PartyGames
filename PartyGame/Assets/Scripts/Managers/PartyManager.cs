@@ -21,6 +21,9 @@ public class PartyManager : MonoBehaviour
 
 	public List<PartyTweetData> partyRelatedTweets = new List<PartyTweetData>();
 
+	public Vector3 boundsCentre = Vector3.zero;
+	public float maxBoundsDistace = 20;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -175,6 +178,27 @@ public class PartyManager : MonoBehaviour
 			{
 				mp.GetComponent<MP_Control>().Order ();
 			}
+		}
+	}
+
+	IEnumerator OutOfBoundsCheck()
+	{
+		while (true)
+		{
+			foreach (Party p in parties)
+			{
+				for (int i = 0; i < p.mps.Count; i++)
+				{
+					if (Vector3.Distance (p.mps[i].transform.position, boundsCentre) > maxBoundsDistace)
+					{
+						Debug.Log (p.mps[i] + " is out of bounds. Destroyed.");
+						RemoveMPFromParty (p.mps[i]);
+						i--;
+					}
+				}
+			}
+
+			yield return new WaitForSeconds(5);
 		}
 	}
 }
