@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class GUIM_MainGame : MonoBehaviour
 {
+	public GameManager gameManager;
+
 	public Canvas mainGameCanvas;
 	public GameObject partyScoringPrefab;
 	public GameObject tickerItemPrefab;
@@ -18,6 +20,11 @@ public class GUIM_MainGame : MonoBehaviour
 	private float newsTickerSpacing = 200;
 
 	private int lastTickerItem = 0;
+
+	private int currentParty = 0;
+	private int nextParty = 0;
+	private float progress = 1;
+	private float holdColour = 1;
 
 	// Use this for initialization
 	void Start ()
@@ -104,6 +111,30 @@ public class GUIM_MainGame : MonoBehaviour
 				i--;
 			}
 		}
+
+		//Colour the ticker.
+		if (progress >= 1)
+		{
+			if (holdColour >= 1)
+			{
+				currentParty = nextParty;
+				nextParty = Random.Range (0, FindObjectOfType<PartyManager>().parties.Length);
+				
+				progress = 0;
+				holdColour = 0;
+			}
+			else
+				holdColour += Time.deltaTime * (0.1f);
+		}
+		else
+		{
+			Color newColour = Color.Lerp (FindObjectOfType<PartyManager>().parties[currentParty].colour, FindObjectOfType<PartyManager>().parties[nextParty].colour, progress);
+			
+			mainGameCanvas.transform.FindChild ("Panel - Ticker").GetComponent<Image>().color = newColour;
+			mainGameCanvas.transform.FindChild ("Image - Ticker Logo").GetComponent<Image>().color = newColour;
+		}
+		
+		progress += Time.deltaTime * (0.05f);
 	}
 
 	public void SetPartyScoringObjects(Party[] parties)

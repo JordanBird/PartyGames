@@ -13,10 +13,10 @@ using System.Net.Security;
 
 public class Twitter
 {
-	static string oauthconsumerkey = "mR3rH2JIVQJgFSfreMh0eF4zA";
-	static string oauthtoken = "20883292-eEIzdZiAllqgVoew2ruOoNgaeZiXc4ZvD88etfDlg";
-	static string oauthconsumersecret = "HZeUauA45bPDIdHzYqGsUYlClgt05iLs9RqGHUnEQwL14yPo8C";
-	static string oauthtokensecret = "tQfVpbOJfl6oxN1jkCnz8CAQN6UcMF9FDDx4KIZzIuZ9M";
+	public static string oauthconsumerkey = "REFIgn1zA7nlBy447Os5uCxAO";
+	public static string oauthtoken = "20883292-iqPfJiFFQADYOA7EL1jyOBZBm8vErXy6LFKzyhGEp";
+	public static string oauthconsumersecret = "WYvr2AqXfwAqtcTdVCsNrcAt9btsxz6sAiRThlQ2Wu02z0XrwL";
+	public static string oauthtokensecret = "C0TrE24FG7Ck0vJMFezVzzktZQmltRwNy8lLH3g2Vu06A";
 
 	static public void Verify_Credentials()
 	{

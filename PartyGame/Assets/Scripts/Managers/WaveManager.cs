@@ -64,7 +64,6 @@ public class WaveManager : MonoBehaviour
 	{
 		//This is where you specify the search term for the tweets you want. Result type can be 'new', 'popular' or 'mixed'.
 		StartCoroutine (GetTweets(gameManager.twitterManager.CreateSearchUserWWW (electionHashtag, "new")));
-		StartCoroutine (SearchForUserTweets ());
 	}
 
 	public void SpawnWave(string tweets)
@@ -79,14 +78,12 @@ public class WaveManager : MonoBehaviour
 		gameManager.partyManager.PopulatePartiesWithCount(Twitter.ParseSearchResults (tweets));
 		gameManager.partyManager.SpawnMPs ();
 
-		StartCoroutine (DEBUG_SimulateUserTweets ());
 		StartCoroutine (SearchForUserTweets());
 	}
 
 	public void EndWave()
 	{
 		StopCoroutine (SearchForUserTweets());
-		StopCoroutine (DEBUG_SimulateUserTweets());
 
 		waveInProgress = false;
 
@@ -185,7 +182,7 @@ public class WaveManager : MonoBehaviour
 		{
 			if (foundTweets[i].createdAt <= lastScannedTweet)
 				continue;
-			
+
 			if (foundTweets[i].createdAt > highestThisRunthough)
 				highestThisRunthough = foundTweets[i].createdAt;
 			
@@ -231,7 +228,7 @@ public class WaveManager : MonoBehaviour
 	{
 		GameObject mp = gameManager.partyManager.SpawnMP (party);
 
-		mp.transform.localScale = new Vector3 (2, 2, 2);
+		mp.transform.localScale = new Vector3 (1.5f, 1.5f, 1.5f);
 		mp.GetComponent<MP_Control> ().SetHealth (150);
 
 		//Update GUI
@@ -246,6 +243,7 @@ public class WaveManager : MonoBehaviour
 	{
 		while (waveInProgress)
 		{
+			Debug.Log ("Starting Coroutine.");
 			StartCoroutine (GetUserTweets(gameManager.twitterManager.CreateSearchUserWWW (userTweets, "new")));
 			yield return new WaitForSeconds(25);//Every 25 seconds search for user tweets. This should follow Twitter's API limit of 180 searchs / 15 minutes. As that should give us 20 seconds.
 		}

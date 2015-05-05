@@ -19,6 +19,8 @@ public class Party
 
 	public int winCount = 0;
 
+	public List<Seat> seats = new List<Seat>();
+
 	public Party(string name)
 	{
 		this.name = name;

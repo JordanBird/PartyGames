@@ -18,8 +18,8 @@ public class PunchedDamage : MonoBehaviour {
 	void OnCollisionEnter(Collision other){
 		if (other.transform.tag == "Fist" && other.gameObject.GetComponent<PunchForce>().Party != Party)
 		{
-			Debug.Log (Party+other.gameObject.GetComponent<PunchForce>().Party);
-			Parent.GetComponent<MP_Control> ().DealDamage (30);
+			//Debug.Log (Party+other.gameObject.GetComponent<PunchForce>().Party);
+			Parent.GetComponent<MP_Control> ().DealDamage (5);
 			Parent.GetComponent<MP_Control> ().HitsPerSecond++;
 
 			//Spawn a hit marker.

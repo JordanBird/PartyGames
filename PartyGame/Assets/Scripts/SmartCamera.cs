@@ -207,7 +207,7 @@ public class SmartCamera : MonoBehaviour
 		FocusDefaultPosition = averagePosition;
 		FocusDefaultPosition = percentageCentre;
 
-		Debug.Log ("Num MPS: " + numMPs + " | Interest: " + totalInterest);
+		//Debug.Log ("Num MPS: " + numMPs + " | Interest: " + totalInterest);
 		
 		// If nothing specifically interesting is going on, just focus at the average position.
 		if (totalInterest / numMPs < AutoFocusInterestThreshold)

@@ -14,13 +14,15 @@ using System.Globalization;
 
 public class TwitterManager : MonoBehaviour
 {
-	bool spawnBirds = false;
-	string tweetData = "";
+	public static string oauthconsumerkey = "REFIgn1zA7nlBy447Os5uCxAO";
+	public static string oauthtoken = "20883292-iqPfJiFFQADYOA7EL1jyOBZBm8vErXy6LFKzyhGEp";
+	public static string oauthconsumersecret = "WYvr2AqXfwAqtcTdVCsNrcAt9btsxz6sAiRThlQ2Wu02z0XrwL";
+	public static string oauthtokensecret = "C0TrE24FG7Ck0vJMFezVzzktZQmltRwNy8lLH3g2Vu06A";
 
 	// Use this for initialization
 	void Start ()
 	{
-        GetBearerToken();
+        //GetBearerToken();
 	}
 	
 	// Update is called once per frame
@@ -39,10 +41,6 @@ public class TwitterManager : MonoBehaviour
 		ServicePointManager.ServerCertificateValidationCallback = Validator;
 		
 		string url = "https://api.twitter.com/1.1/trends/place.json?id=23424975"; //1= Everywhere, 23424975 = UK
-		string oauthconsumerkey = "mR3rH2JIVQJgFSfreMh0eF4zA";
-		string oauthtoken = "20883292-eEIzdZiAllqgVoew2ruOoNgaeZiXc4ZvD88etfDlg";
-		string oauthconsumersecret = "HZeUauA45bPDIdHzYqGsUYlClgt05iLs9RqGHUnEQwL14yPo8C";
-		string oauthtokensecret = "tQfVpbOJfl6oxN1jkCnz8CAQN6UcMF9FDDx4KIZzIuZ9M";
 		string oauthsignaturemethod = "HMAC-SHA1";
 		string oauthversion = "1.0";
 		string oauthnonce = Convert.ToBase64String(new ASCIIEncoding().GetBytes(DateTime.Now.Ticks.ToString()));
@@ -118,9 +116,6 @@ public class TwitterManager : MonoBehaviour
     {
         ServicePointManager.ServerCertificateValidationCallback = Validator;
 
-        string oauthconsumerkey = "mR3rH2JIVQJgFSfreMh0eF4zA";
-        string oauthconsumersecret = "HZeUauA45bPDIdHzYqGsUYlClgt05iLs9RqGHUnEQwL14yPo8C";
-
         string encode = Convert.ToBase64String(new ASCIIEncoding().GetBytes((oauthconsumerkey + ":" + oauthconsumersecret)));
 
         string authorizationHeaderParams = "Basic " + encode;
@@ -140,10 +135,6 @@ public class TwitterManager : MonoBehaviour
         ServicePointManager.ServerCertificateValidationCallback = Validator;
 
 		string url = "https://api.twitter.com/1.1/trends/place.json?id=23424975"; //1=WW, 23424975 = 23424975
-        string oauthconsumerkey = "mR3rH2JIVQJgFSfreMh0eF4zA";
-        string oauthtoken = "20883292-eEIzdZiAllqgVoew2ruOoNgaeZiXc4ZvD88etfDlg";
-        string oauthconsumersecret = "HZeUauA45bPDIdHzYqGsUYlClgt05iLs9RqGHUnEQwL14yPo8C";
-        string oauthtokensecret = "tQfVpbOJfl6oxN1jkCnz8CAQN6UcMF9FDDx4KIZzIuZ9M";
         string oauthsignaturemethod = "HMAC-SHA1";
         string oauthversion = "1.0";
         string oauthnonce = Convert.ToBase64String(new ASCIIEncoding().GetBytes(DateTime.Now.Ticks.ToString()));
@@ -222,10 +213,6 @@ public class TwitterManager : MonoBehaviour
 		string searchTerm = System.Uri.EscapeDataString("GamerGate");
 		
 		string url = "https://api.twitter.com/1.1/search/tweets.json?result_type=recent&include_entities=false&count=100&lang=en&q=" + searchTerm;
-		string oauthconsumerkey = "mR3rH2JIVQJgFSfreMh0eF4zA";
-		string oauthtoken = "20883292-eEIzdZiAllqgVoew2ruOoNgaeZiXc4ZvD88etfDlg";
-		string oauthconsumersecret = "HZeUauA45bPDIdHzYqGsUYlClgt05iLs9RqGHUnEQwL14yPo8C";
-		string oauthtokensecret = "tQfVpbOJfl6oxN1jkCnz8CAQN6UcMF9FDDx4KIZzIuZ9M";
 		string oauthsignaturemethod = "HMAC-SHA1";
 		string oauthversion = "1.0";
 		string oauthnonce = Convert.ToBase64String(new ASCIIEncoding().GetBytes(DateTime.Now.Ticks.ToString()));
@@ -312,9 +299,6 @@ public class TwitterManager : MonoBehaviour
 	public void TweetDataDownloaded(object sender, DownloadStringCompletedEventArgs e)
 	{
 		Debug.Log ("Data Downloaded");
-
-		spawnBirds = true;
-		tweetData = e.Result;
 	}
 
 	public WWW CreateSearchUserWWW(string searchTerm, string resultType)
@@ -328,10 +312,6 @@ public class TwitterManager : MonoBehaviour
 		searchTerm = Twitter.CleanDroppedCharacters (searchTerm);
 
 		string url = "https://api.twitter.com/1.1/search/tweets.json?result_type=" + resultType +"&include_entities=false&count=100&lang=en&q=" + searchTerm;
-		string oauthconsumerkey = "mR3rH2JIVQJgFSfreMh0eF4zA";
-		string oauthtoken = "20883292-eEIzdZiAllqgVoew2ruOoNgaeZiXc4ZvD88etfDlg";
-		string oauthconsumersecret = "HZeUauA45bPDIdHzYqGsUYlClgt05iLs9RqGHUnEQwL14yPo8C";
-		string oauthtokensecret = "tQfVpbOJfl6oxN1jkCnz8CAQN6UcMF9FDDx4KIZzIuZ9M";
 		string oauthsignaturemethod = "HMAC-SHA1";
 		string oauthversion = "1.0";
 		string oauthnonce = Convert.ToBase64String(new ASCIIEncoding().GetBytes(DateTime.Now.Ticks.ToString()));
@@ -416,8 +396,6 @@ public class TwitterManager : MonoBehaviour
 		if (www.error == null)
 		{
 			Debug.Log("WWW Ok!: " + www.responseHeaders);
-			spawnBirds = true;
-			tweetData = www.text;
 		}
 		else
 		{

@@ -6,13 +6,7 @@ public class PartyManager : MonoBehaviour
 {
 	public GameManager gameManager;
 
-	public GameObject conservativePrefab;
-	public GameObject greenPrefab;
-	public GameObject labourPrefab;
-	public GameObject libDemPrefab;
-	public GameObject ukipPrefab;
-	public GameObject snpPrefab;
-	public GameObject plaidPrefab;
+	public GameObject mpPrefab;
 
 	public GameObject deathEffect;
 	public GameObject[] hitEffects;
@@ -29,19 +23,55 @@ public class PartyManager : MonoBehaviour
 	{
 		gameManager = FindObjectOfType<GameManager> ();
 
-		Party conservative = new Party ("Conservative", new Color(0, 0.5294117647f, 0.86274509803f), null, new string[] { "David Cameron" }, conservativePrefab);
-		Party green = new Party ("Green", new Color(0.41568627451f, 0.69019607843f, 0.13725490196f), null, new string[] { "Natalie Bennett" }, greenPrefab);
-		Party labour = new Party ("Labour", new Color(0.86274509803f, 0.14117647058f, 0.12156862745f), null, new string[] { "Ed Miliband", }, labourPrefab);
-		Party libDems = new Party ("LibDem", new Color(1, 0.49803921568f, 0), new string[] { "Lib Dems", "Lib Dem" }, new string[] { "Nick Clegg" }, libDemPrefab);
-		Party ukip = new Party ("Ukip", new Color(0.50196078431f, 0, 0.50196078431f), new string[] { "UK Independance Party" }, new string[] { "Nigel Farage" }, ukipPrefab);
-		Party snp = new Party ("SNP", new Color(1, 1, 0), new string[] { "Scottish National Party" }, new string[] { "Alex Salmond", "Nicola Sturgeon" }, snpPrefab);
-		Party plaid = new Party ("Plaid", new Color(0, 0.50588235294f, 0.25882352941f), new string[] { "Plaid Cymru" }, new string[] { "Leanne Wood" }, plaidPrefab);
+		string [] conKey = new string[] { "David Cameron" };
+		string [] greKey = new string[] { "Natalie Bennett" };
+		string [] labKey = new string[] { "Ed Miliband" };
+		string [] libKey = new string[] { "Nick Clegg" };
+		string [] ukipKey = new string[] { "Nigel Farage" };
+		string [] snpKey = new string[] { "Alex Salmond", "Nicola Sturgeon" };
+		string [] plaidKey = new string[] { "Leanne Wood" };
+
+		string [] conNam = new string[] { "Conservatives", "Tories" };
+		string [] greNam = new string[] { "Green Party", "Green" };
+		string [] labNam = null;
+		string [] libNam = new string[] { "Lib Dems", "Lib Dem", "LibDems", "LibDem" };
+		string [] ukipNam = new string[] { "UKIP" };
+		string [] snpNam = new string[] { "SNP" };
+		string [] plaidNam = new string[] { "Plaid", "Cymru" };
+
+		Party conservative = new Party ("Conservative", new Color(0, 0.5294117647f, 0.86274509803f), conNam, conKey, null);
+		Party green = new Party ("Green", new Color(0.41568627451f, 0.69019607843f, 0.13725490196f), greNam, greKey, null);
+		Party labour = new Party ("Labour", new Color(0.86274509803f, 0.14117647058f, 0.12156862745f), labNam, labKey, null);
+		Party libDems = new Party ("Liberal Democrats", new Color(1, 0.49803921568f, 0), libNam, libKey, null);
+		Party ukip = new Party ("UK Independance Party", new Color(0.50196078431f, 0, 0.50196078431f), ukipNam, ukipKey, null);
+		Party snp = new Party ("Scottish National Party", new Color(1, 1, 0), snpNam, snpKey, null);
+		Party plaid = new Party ("Plaid Cymru", new Color(0, 0.50588235294f, 0.25882352941f), plaidNam, plaidKey, null);
 
 		//Populate parties array with created parties.
 		parties = new Party[] { conservative, green, labour, libDems, ukip, snp, plaid };
 
 		//Instantiate the GUI
 		gameManager.guimMainGame.SetPartyScoringObjects (parties);
+
+		Seat[] seats = GameObject.FindObjectsOfType<Seat> ();
+
+		int seatsForParties = Mathf.FloorToInt(seats.Length / parties.Length);
+
+		int currentParty = 0;
+		int currentSeats = 0;
+
+		for (int i = 0; currentParty < parties.Length; i++)
+		{
+			parties[currentParty].seats.Add (seats[i]);
+
+			currentSeats++;
+
+			if (currentSeats >= seatsForParties)
+			{
+				currentSeats = 0;
+				currentParty++;
+			}
+		}
 	}
 	
 	// Update is called once per frame
@@ -52,9 +82,39 @@ public class PartyManager : MonoBehaviour
 
 	public void SpawnMPs()
 	{
-		for (int i = 0; i < partyRelatedTweets.Count; i++)
+		if (partyRelatedTweets.Count == 0)
 		{
-			SpawnMP (partyRelatedTweets[i].party);
+			Debug.Log ("Rate Limited. Spawning Polls");
+
+			for (int i = 0; i < 43; i++)
+			{
+				SpawnMP(parties[0]);
+			}
+
+			for (int i = 0; i < 42; i++)
+			{
+				SpawnMP(parties[2]);
+			}
+
+			for (int i = 0; i < 4; i++)
+			{
+				SpawnMP(parties[3]);
+			}
+
+			for (int i = 0; i < 4; i++)
+			{
+				SpawnMP(parties[5]);
+			}
+
+			SpawnMP(parties[1]);
+			SpawnMP(parties[4]);
+		}
+		else
+		{
+			for (int i = 0; i < partyRelatedTweets.Count; i++)
+			{
+				SpawnMP (partyRelatedTweets[i].party);
+			}
 		}
 	}
 
@@ -98,16 +158,34 @@ public class PartyManager : MonoBehaviour
 
 	public GameObject SpawnMP(Party party)
 	{
-		GameObject home = GameObject.Find(party.name + "Home");
+		GameObject home = party.seats [Random.Range (0, party.seats.Count)].gameObject;
 		
 		Vector3 position = Vector3.zero;
 		
 		if (home != null)
 		{
-			position = new Vector3(home.transform.position.x + Random.Range (-2f, 2f), home.transform.position.y - 2, home.transform.position.z + Random.Range (-2f, 2f));
+			float x = home.transform.position.x + Random.Range (-(home.transform.localScale.x / 2), (home.transform.localScale.x / 2));
+			float y = home.transform.position.y + Random.Range (-(home.transform.localScale.y / 2), (home.transform.localScale.y / 2));
+			float z = home.transform.position.z + Random.Range (-(home.transform.localScale.z / 2), (home.transform.localScale.z / 2));
+
+			position = new Vector3(x, y, z);
 		}
 		
-		GameObject mp = Instantiate (party.prefab, position, Quaternion.identity) as GameObject;
+		GameObject mp = Instantiate (mpPrefab, position, Quaternion.identity) as GameObject;
+		mp.GetComponent<MP_Control> ().Party = party.name;
+		mp.GetComponentInChildren<PunchedDamage>().Party = party.name;
+
+		foreach (PunchForce pf in mp.GetComponentsInChildren<PunchForce>())
+		{
+			pf.Party = party.name;
+		}
+		
+		foreach (Renderer r in mp.GetComponentsInChildren<Renderer>())
+		{
+			if (r.tag == "Colourable Item")
+				r.material.color = party.colour;
+		}
+
 		mp.transform.parent = gameManager.dynamicObjectHolder.transform;
 
 		party.mps.Add (mp);

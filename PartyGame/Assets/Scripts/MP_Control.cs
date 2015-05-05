@@ -9,10 +9,14 @@ public class MP_Control : MonoBehaviour
 
 	private PunchForce[] punchForces;
 
+	private Vector3 oldScale = Vector3.one;
+
 	// Use this for initialization
 	void Start ()
 	{
 		punchForces = GetComponentsInChildren<PunchForce> ();
+
+		StartCoroutine (ScaleSpawn ());
 	}
 	
 	// Update is called once per frame
@@ -51,10 +55,14 @@ public class MP_Control : MonoBehaviour
 
 	public void Order()
 	{
-		foreach (PunchForce pf in punchForces)
+		try
 		{
-			pf.Order();
+			foreach (PunchForce pf in punchForces)
+			{
+				pf.Order();
+			}
 		}
+		catch {}
 	}
 
 	public void AddForce(Vector3 force)
@@ -62,6 +70,38 @@ public class MP_Control : MonoBehaviour
 		foreach (PunchForce pf in punchForces)
 		{
 			pf.AddForce (force);
+		}
+	}
+
+	IEnumerator ScaleSpawn()
+	{
+		oldScale = transform.localScale;
+		transform.localScale = Vector3.one * 0.01f;
+
+		Vector3 jump = oldScale * 0.1f;
+
+		float progress = 0;
+
+		while (transform.localScale != oldScale + jump)
+		{
+			progress += 0.1f;
+			transform.localScale = Vector3.Lerp(transform.localScale, oldScale + jump, progress);
+
+			yield return new WaitForSeconds(0.01f);
+		}
+
+		progress = 0;
+		while (transform.localScale != oldScale)
+		{
+			progress += 0.1f;
+			transform.localScale = Vector3.Lerp(transform.localScale, oldScale, progress);
+			
+			yield return new WaitForSeconds(0.01f);
+		}
+
+		foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
+		{
+			rb.isKinematic = false;
 		}
 	}
 }

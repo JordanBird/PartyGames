@@ -29,6 +29,9 @@ public class GameManager : MonoBehaviour
 
 		//Jordan Says: Scraping here might be good for more data and key words: http://www.bbc.co.uk/news/election/2015/manifesto-guide
 
+		//DEBUG: To leave game running.
+		Application.runInBackground = true;
+
 		//Launch the Game
 		StartGame ();
 	}
