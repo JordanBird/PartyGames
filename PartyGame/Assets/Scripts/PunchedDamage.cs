@@ -15,15 +15,15 @@ public class PunchedDamage : MonoBehaviour {
 	
 	}
 
-	void OnCollisionEnter(Collision other){
+	void OnTriggerEnter(Collider other){
 		if (other.transform.tag == "Fist" && other.gameObject.GetComponent<PunchForce>().Party != Party)
 		{
 			//Debug.Log (Party+other.gameObject.GetComponent<PunchForce>().Party);
-			Parent.GetComponent<MP_Control> ().DealDamage (5);
+			Parent.GetComponent<MP_Control> ().DealDamage (Random.Range (1, 4));
 			Parent.GetComponent<MP_Control> ().HitsPerSecond++;
 
 			//Spawn a hit marker.
-			FindObjectOfType<PartyManager>().SpawnHitMarker (Party, other.contacts[0].point);
+			FindObjectOfType<PartyManager>().SpawnHitMarker (Party, transform.position);
 		}
 	}
 }

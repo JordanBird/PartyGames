@@ -50,6 +50,15 @@ public class PartyManager : MonoBehaviour
 		//Populate parties array with created parties.
 		parties = new Party[] { conservative, green, labour, libDems, ukip, snp, plaid };
 
+		//Set old scores in case of crash.
+		foreach (Party p in parties)
+		{
+			if (PlayerPrefs.HasKey (p.name + " Wins"))
+			{
+				p.winCount = PlayerPrefs.GetInt (p.name + " Wins");
+			}
+		}
+
 		//Instantiate the GUI
 		gameManager.guimMainGame.SetPartyScoringObjects (parties);
 
@@ -253,6 +262,8 @@ public class PartyManager : MonoBehaviour
 
 	public void ACTION_Order()
 	{
+		StartCoroutine (FindObjectOfType<Order> ().ShowSign ());
+
 		foreach (Party p in parties)
 		{
 			for (int i = 0; i < p.mps.Count; i++)

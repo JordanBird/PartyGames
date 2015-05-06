@@ -17,12 +17,21 @@ public class Order : MonoBehaviour
 	{
 		if (Input.GetKeyDown (KeyCode.Space))
 		{
-			GetComponent<Text>().enabled = true;
+			//GetComponent<Text>().enabled = true;
 			gameManager.partyManager.ACTION_Order ();
 		}
+//
+//	if (Input.GetKeyUp (KeyCode.Space)) {
+//			GetComponent<Text>().enabled = false;
+//		}
+	}
 
-	if (Input.GetKeyUp (KeyCode.Space)) {
-			GetComponent<Text>().enabled = false;
-		}
+	public IEnumerator ShowSign()
+	{
+		GetComponent<Text>().enabled = true;
+
+		yield return new WaitForSeconds(0.5f);
+
+		GetComponent<Text>().enabled = false;
 	}
 }

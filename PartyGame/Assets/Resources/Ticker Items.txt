@@ -1,5 +1,5 @@
 <!Instructions
-You can spawn a tougher MP for a party by tweeting '#NVAElection [Party Name]'. For example: #NVAElection NVAPArty.
+You can spawn a tougher MP for a party by tweeting '#NVAElection [Party Name]'. For example: #NVAElection NVAParty.
 You can call order in the House of Commons by tweeting '#NVAElection Order'!
 You can call order in the House of Commons by pressing the button!
 Help your party out by tweeting their name to #NVAElection!

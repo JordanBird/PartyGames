@@ -131,7 +131,7 @@ public class GUIM_MainGame : MonoBehaviour
 			Color newColour = Color.Lerp (FindObjectOfType<PartyManager>().parties[currentParty].colour, FindObjectOfType<PartyManager>().parties[nextParty].colour, progress);
 			
 			mainGameCanvas.transform.FindChild ("Panel - Ticker").GetComponent<Image>().color = newColour;
-			mainGameCanvas.transform.FindChild ("Image - Ticker Logo").GetComponent<Image>().color = newColour;
+			mainGameCanvas.transform.FindChild ("Image - Ticker Bar").GetComponent<Image>().color = newColour;
 		}
 		
 		progress += Time.deltaTime * (0.05f);
@@ -186,6 +186,9 @@ public class GUIM_MainGame : MonoBehaviour
 				g.transform.FindChild ("Text - MPs").GetComponent<Text>().text = party.mps.Count.ToString ();
 				g.transform.FindChild ("Text - Wave Wins").GetComponent<Text>().text = party.winCount.ToString ();
 
+				PlayerPrefs.SetInt (party.name + " Wins", party.winCount);
+				PlayerPrefs.Save ();
+
 				return;
 			}
 		}
@@ -199,6 +202,9 @@ public class GUIM_MainGame : MonoBehaviour
 	public void UpdateWaveNumber(string wave)
 	{
 		mainGameCanvas.transform.FindChild ("Text - Wave #").GetComponent<Text> ().text = "Wave: " + wave;
+
+		PlayerPrefs.SetInt ("Waves", int.Parse (wave));
+		PlayerPrefs.Save ();
 	}
 
 	public IEnumerator FlashPartyColour(Party party)

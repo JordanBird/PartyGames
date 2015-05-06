@@ -33,8 +33,8 @@ public class PunchForce : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-	
-		Rb.AddForce (Vector3.up * 50);
+		//Enable this if MPs stick to the floor too much.
+		//Rb.AddForce (Vector3.up * 50);
 		PunchDelay += 1 * Time.deltaTime;
 	
 		if (PunchDelay >= Random.Range(1.0f,6.0f))
@@ -42,8 +42,12 @@ public class PunchForce : MonoBehaviour
 			if (target == null)
 			{
 				Party targetParty = gameManager.partyManager.parties[Random.Range (0, gameManager.partyManager.parties.Length)];
+
+				if (targetParty.name == Party) //Allow it to still happen but lessen the chance.
+					targetParty = gameManager.partyManager.parties[Random.Range (0, gameManager.partyManager.parties.Length)];
+
 				TarParty = targetParty.name;
-				
+
 				GameObject[] MPList = targetParty.mps.ToArray ();
 				
 				if (MPList.Length > 0)
@@ -58,6 +62,8 @@ public class PunchForce : MonoBehaviour
 					//Dir = Head / Dis;
 					//Rb.AddForce (Dir * 50500);
 				}
+				else
+					PunchDelay = 6;
 
 				try
 				{
@@ -66,7 +72,7 @@ public class PunchForce : MonoBehaviour
 				}
 				catch
 				{
-					PunchDelay = 0;
+					PunchDelay = 6;
 				}
 			}
 

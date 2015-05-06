@@ -3,6 +3,8 @@ using System.Collections;
 
 public class MP_Control : MonoBehaviour
 {
+	public GameManager gameManager;
+
 	public string Party;
 	private float Health = 100;
 	public float HitsPerSecond { get; set; }
@@ -11,9 +13,12 @@ public class MP_Control : MonoBehaviour
 
 	private Vector3 oldScale = Vector3.one;
 
+	public GameObject target = null;
+
 	// Use this for initialization
 	void Start ()
 	{
+		gameManager = FindObjectOfType<GameManager> ();
 		punchForces = GetComponentsInChildren<PunchForce> ();
 
 		StartCoroutine (ScaleSpawn ());
@@ -25,6 +30,33 @@ public class MP_Control : MonoBehaviour
 		HitsPerSecond -= Time.deltaTime;
 		if (HitsPerSecond < 0)
 			HitsPerSecond = 0;
+
+//		if (target == null)
+//		{
+//			Party targetParty = gameManager.partyManager.parties[Random.Range (0, gameManager.partyManager.parties.Length)];
+//			
+//			if (targetParty.name == Party) //Allow it to still happen but lessen the chance.
+//				targetParty = gameManager.partyManager.parties[Random.Range (0, gameManager.partyManager.parties.Length)];
+//			
+//			string tarParty = targetParty.name;
+//			
+//			GameObject[] MPList = targetParty.mps.ToArray ();
+//			
+//			if (MPList.Length > 0)
+//			{
+//				target = MPList[Random.Range(0,MPList.Length)];
+//				foreach (Transform child in target.GetComponentInChildren<Transform>()) {
+//					if (child.tag == "Target"){
+//						target = child.gameObject;}
+//				} 
+//				//Head = Target.transform.position - transform.position;
+//				//Dis = Target.transform.position.magnitude;
+//				//Dir = Head / Dis;
+//				//Rb.AddForce (Dir * 50500);
+//			}
+//			else
+//				PunchDelay = 6;
+//		}
 	}
 
 	public void DealDamage(float amount)

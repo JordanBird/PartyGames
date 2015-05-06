@@ -15,7 +15,7 @@ public class WaveManager : MonoBehaviour
 
 	public bool waveInProgress = false;
 
-	public static string userTweets = "#TestParty";
+	public static string userTweets = "#NVAElection";
 	public static string electionHashtag = "#GE2015";
 
 	public List<UserAction> userActions = new List<UserAction>();
@@ -39,6 +39,9 @@ public class WaveManager : MonoBehaviour
 		//Setup Times
 		lastScannedTweet = System.DateTime.Now;
 		highestThisRunthough = System.DateTime.Now;
+
+		if (PlayerPrefs.HasKey ("Waves"))
+			wave = PlayerPrefs.GetInt ("Waves") - 1;
 	}
 	
 	// Update is called once per frame

@@ -204,8 +204,6 @@ public class Twitter
 	public static Tweet[] ParseSearchResults(string searchResults)
 	{
 		string[] rawTweets = searchResults.Split(new string[] { "\"metadata\"" }, StringSplitOptions.RemoveEmptyEntries);
-		Debug.Log (rawTweets.Length);
-		Debug.Log (rawTweets.Length - 1);
 
 		if (rawTweets.Length == 0)
 			return new Tweet[0];
