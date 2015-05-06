@@ -16,7 +16,7 @@ public class SmartCamera : MonoBehaviour
 	
 	#region Focusing
 	private bool focused = false;
-	private Transform focus;
+	private Transform focus = null;
 	private Vector3 lastFocusPosition;
 	private Vector3 currentFocusPosition;
 	public Vector3 FocusDefaultPosition;
@@ -36,6 +36,7 @@ public class SmartCamera : MonoBehaviour
 
 	public bool AutoFocus;
 	public float AutoFocusInterestThreshold;
+	public int FocusChance;
 	#endregion
 	
 	#region Shaking
@@ -53,7 +54,7 @@ public class SmartCamera : MonoBehaviour
 	{
 		camera = GetComponent<Camera>();
 		currentFocusFOV = lastFocusFOV = FocusFOVMax;
-		focusFollowDuration = FocusFollowDurationMax;
+		focusFollowTimer = focusFollowDuration = FocusFollowDurationMax;
 	}
 
 	void Start()
@@ -78,69 +79,59 @@ public class SmartCamera : MonoBehaviour
 	
 	void Focus()
 	{
-		// Check if the object focused on has been destroyed.
-		if (focused && focus == null)
-			SetFocus (percentageCentre);
-
 		if (AutoFocus)
 		{
 			// Change focus if the follow timer has finished.
 			focusFollowTimer += Time.deltaTime;
-			if (focusFollowTimer >= focusFollowDuration)
+			if (focusFollowTimer >= focusFollowDuration || focused && focus == null)
 			{
 				// Automatically find the next thing to focus on.
-				DetermineFocus();
-			}
-		}
-
-		// If the change timer has ended, follow the focus smoothly.
-		if (focusChangeTimer >= focusChangeDuration)
-		{
-			// Aim at focus.
-			if (focus != null)
-				currentFocusPosition = focused ? focus.position : FocusDefaultPosition;
-			else
-				focused = false;
-
-			if (FocusFollowSmoothness > 0)
-			{
-				Quaternion targetLook = Quaternion.LookRotation(currentFocusPosition - transform.position);
-				transform.rotation = Quaternion.Lerp(transform.rotation, targetLook, 1 / FocusFollowSmoothness);
-			}
-			else
-			{
-				transform.LookAt (currentFocusPosition);
-			}
-		}
-		else // Smooth transition between the foci.
-		{
-			focusChangeTimer += Time.deltaTime;
-			if (focusChangeTimer > focusChangeDuration)
-				focusChangeTimer = focusChangeDuration;
-
-			float interpolation = Mathf.SmoothStep (0.0f, 1.0f, focusChangeTimer / focusChangeDuration);
+				if (Random.Range (0, 100) < FocusChance)
+					DetermineFocus();
+				else
+					SetFocus(null);
 			
-			// Look at the intermediate position between the last focus position and the new focus.
-			if (focus != null)
-				currentFocusPosition = Vector3.Lerp (lastFocusPosition, focused ? focus.position : FocusDefaultPosition, interpolation);
-			else
-				focused = false;
-
-			transform.LookAt(currentFocusPosition);
-
-			if (focused)
-			{
-				// Zoom out then in.  The maximum zoomed out is scaled by the angle between focal points.
-				currentFocusFOV = Mathf.Lerp (Mathf.Lerp (lastFocusFOV, FocusFOVMin, interpolation), Mathf.Lerp (FocusFOVMin, FocusFOVMax, focusChangeDuration / FocusChangeSmoothness), Mathf.Sin(interpolation * Mathf.PI));
+				Debug.Log (focus);
 			}
-			else
-			{
-				// Zoom out.
-				currentFocusFOV = Mathf.Lerp (lastFocusFOV, FocusFOVMax, interpolation);
-			}
-
-			camera.fieldOfView = currentFocusFOV; 
 		}
+
+		// Follow the focus smoothly.
+		float interpolation = Mathf.SmoothStep (0.0f, 1.0f, Mathf.Min (focusChangeTimer / focusChangeDuration, 1.0f));
+
+		// Look at the intermediate position between the last focus position and the new focus.
+		Vector3 nextFocusPosition = currentFocusPosition;
+		if (focus != null)
+		{
+			nextFocusPosition = Vector3.Lerp (lastFocusPosition, focused ? focus.position : FocusDefaultPosition, interpolation);
+		}
+		else
+		{
+			nextFocusPosition = Vector3.Lerp (lastFocusPosition, FocusDefaultPosition, interpolation);
+		}
+		// Do the cheaty lerp to make it even smoother.
+		currentFocusPosition = Vector3.Lerp (currentFocusPosition, nextFocusPosition, 0.3f);
+		
+		transform.LookAt(currentFocusPosition);
+
+		float nextFocusFOV = currentFocusFOV;
+		if (focused)
+		{
+			// Zoom out then in.  The maximum zoomed out is scaled by the angle between focal points.
+			nextFocusFOV = Mathf.Lerp (Mathf.Lerp (lastFocusFOV, FocusFOVMin, interpolation), Mathf.Lerp (FocusFOVMin, FocusFOVMax, focusChangeDuration / FocusChangeSmoothness), Mathf.Sin(interpolation * Mathf.PI));
+		}
+		else
+		{
+			// Zoom out.
+			nextFocusFOV = Mathf.Lerp (lastFocusFOV, FocusFOVMax, interpolation);
+		}
+		// Do the cheaty lerp to make it even smoother.
+		currentFocusFOV = Mathf.Lerp (currentFocusFOV, nextFocusFOV, 0.3f);
+
+		camera.fieldOfView = currentFocusFOV; 
+
+		focusChangeTimer += Time.deltaTime;
+		if (focusChangeTimer > focusChangeDuration)
+			focusChangeTimer = focusChangeDuration;
 	}
 	
 	void Shake()
@@ -164,7 +155,7 @@ public class SmartCamera : MonoBehaviour
 		// Get the time it should take to change aim.
 		float angle = Vector3.Angle (transform.forward, (focused ? focus.position : FocusDefaultPosition) - transform.position);
 		focusChangeTimer = 0.0f;
-		focusChangeDuration = focused ? angle / 90.0f * FocusChangeSmoothness : FocusChangeSmoothness * 0.5f;
+		focusChangeDuration = Mathf.Clamp(focused ? angle / 90.0f * FocusChangeSmoothness : FocusChangeSmoothness * 0.5f, 1.0f, FocusChangeSmoothness * 0.1f);
 
 		// Reset the follow timer.
 		focusFollowTimer = 0.0f;
@@ -191,6 +182,7 @@ public class SmartCamera : MonoBehaviour
 
 	void DetermineFocus()
 	{
+		Debug.Log ("Finding focus");
 		GameManager gm = FindObjectOfType<GameManager>();
 
 		// Copy the list of mps to a new array so that any changes to the list after yielding do not cause errors.
@@ -226,13 +218,14 @@ public class SmartCamera : MonoBehaviour
 		// Rescale the average positions.
 		mostInterestingPosition /= totalInterest;
 		averagePosition /= numMPs;
-		FocusDefaultPosition = averagePosition;
+		FocusDefaultPosition = percentageCentre;
 
 		Debug.Log ("Num MPS: " + numMPs + " | Interest: " + totalInterest);
 
 		// If nothing specifically interesting is going on, just focus at the average position.
 		if (totalInterest / numMPs < AutoFocusInterestThreshold)
 		{
+			Debug.Log ("Percentage Centre 1");
 			SetFocus (percentageCentre);
 		}
 		else
@@ -260,7 +253,7 @@ public class SmartCamera : MonoBehaviour
 				}
 			}
 
-			SetFocus (bestMP == null ? bestMP : bestMP.Find ("HeadTarget"));
+			SetFocus (bestMP == null ? null : bestMP.Find ("HeadTarget"));
 		}
 	}
 	
