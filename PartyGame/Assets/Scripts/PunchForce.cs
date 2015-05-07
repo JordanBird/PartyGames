@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-
 public class PunchForce : MonoBehaviour
 {
 	public GameManager gameManager;
@@ -37,7 +36,7 @@ public class PunchForce : MonoBehaviour
 		//Rb.AddForce (Vector3.up * 50);
 		PunchDelay += 1 * Time.deltaTime;
 	
-		if (PunchDelay >= Random.Range(1.0f,6.0f))
+		if (PunchDelay >= Random.Range(1.0f,10.0f))
 		{
 			if (target == null)
 			{
@@ -63,7 +62,7 @@ public class PunchForce : MonoBehaviour
 					//Rb.AddForce (Dir * 50500);
 				}
 				else
-					PunchDelay = 6;
+					PunchDelay = 10;
 
 				try
 				{
@@ -72,7 +71,7 @@ public class PunchForce : MonoBehaviour
 				}
 				catch
 				{
-					PunchDelay = 6;
+					PunchDelay = 10;
 				}
 			}
 

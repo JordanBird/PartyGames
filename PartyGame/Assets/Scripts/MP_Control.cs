@@ -5,6 +5,8 @@ public class MP_Control : MonoBehaviour
 {
 	public GameManager gameManager;
 
+	public Party party;
+
 	public string Party;
 	private float Health = 100;
 	public float HitsPerSecond { get; set; }
@@ -15,11 +17,14 @@ public class MP_Control : MonoBehaviour
 
 	public GameObject target = null;
 
+	AudioSource audioSource;
+
 	// Use this for initialization
 	void Start ()
 	{
 		gameManager = FindObjectOfType<GameManager> ();
 		punchForces = GetComponentsInChildren<PunchForce> ();
+		audioSource = GetComponent<AudioSource> ();
 
 		StartCoroutine (ScaleSpawn ());
 	}
@@ -61,6 +66,15 @@ public class MP_Control : MonoBehaviour
 
 	public void DealDamage(float amount)
 	{
+		if (amount >= 3)
+		{
+			if (gameManager.partyManager.punchSounds.Length > 0)
+			{
+				audioSource.clip = gameManager.partyManager.punchSounds[Random.Range (0, gameManager.partyManager.punchSounds.Length)];
+				audioSource.Play ();
+			}
+		}
+
 		Health -= amount;
 
 		if (Health <= 0)
@@ -79,7 +93,7 @@ public class MP_Control : MonoBehaviour
 
 	public void Dead()
 	{
-		FindObjectOfType<GameManager> ().partyManager.RemoveMPFromParty (gameObject); //Search rather than cache to save space.
+		FindObjectOfType<GameManager> ().partyManager.RemoveMPFromParty (gameObject, party); //Search rather than cache to save space.
 
 		Destroy (this.gameObject);
 		// Maybe put increment a total of what ever party just got killed.

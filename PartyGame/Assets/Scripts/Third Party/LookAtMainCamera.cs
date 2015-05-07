@@ -7,7 +7,8 @@ public class LookAtMainCamera : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		StartCoroutine (Look ());
+		transform.rotation = Quaternion.LookRotation(transform.position - Camera.main.transform.position);
+		//StartCoroutine (Look ()); //Disabled for perfomance reasons.
 	}
 	
 	// Update is called once per frame
@@ -16,6 +17,9 @@ public class LookAtMainCamera : MonoBehaviour
 		
 	}
 
+	/// <summary>
+	/// Advised agaisnt using for performance issues.
+	/// </summary>
 	IEnumerator Look()
 	{
 		while (true)

@@ -51,9 +51,6 @@ public class GUIM_MainGame : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		float width = mainGameCanvas.pixelRect.width;
-		float height = mainGameCanvas.pixelRect.height;
-
 		while (activeTickerItems.Count < 5)
 		{
 			RectTransform tickerPanel = mainGameCanvas.transform.FindChild ("Panel - Ticker").GetComponent<RectTransform>();
@@ -72,13 +69,11 @@ public class GUIM_MainGame : MonoBehaviour
 
 			item.GetComponent<Text>().text = tickerItems[index];
 
-			Debug.Log(mainGameCanvas.pixelRect.ToString ());
-
 			float itemWidth  = item.GetComponent<RectTransform>().rect.width;
 
 			if (activeTickerItems.Count == 0)
 			{
-				item.GetComponent<RectTransform>().anchoredPosition = new Vector2((width / 2) + itemWidth / 2, 0);
+				item.GetComponent<RectTransform>().anchoredPosition = new Vector2((mainGameCanvas.pixelRect.width / 2) + itemWidth / 2, 0);
 			}
 			else
 			{
@@ -99,12 +94,11 @@ public class GUIM_MainGame : MonoBehaviour
 				float widthPrevious = activeTickerItems[i - 1].GetComponent<RectTransform>().rect.width / 2;
 				float widthSelf = activeTickerItems[i].GetComponent<RectTransform>().rect.width / 2;
 				float speedIncrease = (tickerSpeed * Time.deltaTime);
-				float spacing = newsTickerSpacing;
 
-				activeTickerItems[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(xPosPrevious + widthPrevious + widthSelf + speedIncrease + spacing, activeTickerItems[i - 1].GetComponent<RectTransform>().anchoredPosition.y);
+				activeTickerItems[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(xPosPrevious + widthPrevious + widthSelf + speedIncrease + newsTickerSpacing, activeTickerItems[i - 1].GetComponent<RectTransform>().anchoredPosition.y);
 			}
 
-			if (activeTickerItems[i].GetComponent<RectTransform>().anchoredPosition.x < -(width + activeTickerItems[i].GetComponent<RectTransform>().rect.width / 2))
+			if (activeTickerItems[i].GetComponent<RectTransform>().anchoredPosition.x < -(mainGameCanvas.pixelRect.width + activeTickerItems[i].GetComponent<RectTransform>().rect.width / 2))
 			{
 				Destroy (activeTickerItems[i]);
 				activeTickerItems.RemoveAt (i);
@@ -132,6 +126,8 @@ public class GUIM_MainGame : MonoBehaviour
 			
 			mainGameCanvas.transform.FindChild ("Panel - Ticker").GetComponent<Image>().color = newColour;
 			mainGameCanvas.transform.FindChild ("Image - Ticker Bar").GetComponent<Image>().color = newColour;
+			mainGameCanvas.transform.FindChild ("Text - Wave Timer").GetComponent<Outline>().effectColor = newColour;
+			mainGameCanvas.transform.FindChild ("Text - Wave #").GetComponent<Outline>().effectColor = newColour;
 		}
 		
 		progress += Time.deltaTime * (0.05f);
@@ -210,6 +206,8 @@ public class GUIM_MainGame : MonoBehaviour
 	public IEnumerator FlashPartyColour(Party party)
 	{
 		Text text = null;
+		Text winText = null;
+
 		foreach (GameObject g in partyScores)
 		{
 			if (g.name == "Party Score: " + party.name)
@@ -217,6 +215,11 @@ public class GUIM_MainGame : MonoBehaviour
 				text = g.transform.FindChild ("Text - Party").GetComponent<Text> ();
 				text.text = text.text + "++";
 				text.color = party.colour;
+				text.fontStyle = FontStyle.Bold;
+
+				winText = g.transform.FindChild ("Text - Wave Wins").GetComponent<Text> ();
+				winText.color = party.colour;
+				winText.fontStyle = FontStyle.Bold;
 				break;
 			}
 		}
@@ -231,6 +234,7 @@ public class GUIM_MainGame : MonoBehaviour
 				progress += 0.005f;
 				
 				text.color = Color.Lerp (text.color, Color.white, progress);
+				winText.color = Color.Lerp (text.color, Color.white, progress);
 
 				if (text.color == Color.white)
 					changing = false;
@@ -240,5 +244,8 @@ public class GUIM_MainGame : MonoBehaviour
 		}
 
 		text.text = text.text.Replace ("++", "");
+		text.fontStyle = FontStyle.Normal;
+
+		winText.fontStyle = FontStyle.Normal;
 	}
 }

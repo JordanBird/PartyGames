@@ -256,7 +256,7 @@ public class WaveManager : MonoBehaviour
 	{
 		while (waveInProgress)
 		{
-			Debug.Log ("Starting Coroutine.");
+			//Debug.Log ("Starting Coroutine.");
 			StartCoroutine (GetUserTweets(gameManager.twitterManager.CreateSearchUserWWW (userTweets, "new")));
 			yield return new WaitForSeconds(25);//Every 25 seconds search for user tweets. This should follow Twitter's API limit of 180 searchs / 15 minutes. As that should give us 20 seconds.
 		}

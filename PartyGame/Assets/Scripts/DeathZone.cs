@@ -22,7 +22,7 @@ public class DeathZone : MonoBehaviour
 		{
 			if (collision.collider.gameObject.GetComponent<StayonHead> ().transform.parent.GetComponent<MP_Control>() != null)
 			{
-				gameManager.partyManager.RemoveMPFromParty (collision.collider.gameObject);
+				gameManager.partyManager.RemoveMPFromParty (collision.collider.gameObject, collision.collider.gameObject.GetComponent<StayonHead> ().transform.parent.GetComponent<MP_Control>().party);
 				Debug.Log (collision.collider.gameObject.name + " Entered Death Zone and Died.");
 			}
 		}

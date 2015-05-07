@@ -32,6 +32,8 @@ public class GameManager : MonoBehaviour
 		//DEBUG: To leave game running.
 		Application.runInBackground = true;
 
+		Cursor.visible = false;
+
 		//Launch the Game
 		StartGame ();
 	}

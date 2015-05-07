@@ -18,6 +18,12 @@ public class PartyManager : MonoBehaviour
 	public Vector3 boundsCentre = Vector3.zero;
 	public float maxBoundsDistace = 20;
 
+	private float lastOrder = 0;
+
+	public AudioClip[] punchSounds;
+
+	public bool limited = false;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -91,26 +97,31 @@ public class PartyManager : MonoBehaviour
 
 	public void SpawnMPs()
 	{
+		int limit = 1;
+
+		if (limited)
+			limit = 2;
+
 		if (partyRelatedTweets.Count == 0)
 		{
 			Debug.Log ("Rate Limited. Spawning Polls");
 
-			for (int i = 0; i < 43; i++)
+			for (int i = 0; i < 43 / limit; i++)
 			{
 				SpawnMP(parties[0]);
 			}
 
-			for (int i = 0; i < 42; i++)
+			for (int i = 0; i < 42 / limit; i++)
 			{
 				SpawnMP(parties[2]);
 			}
 
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 4 / limit; i++)
 			{
 				SpawnMP(parties[3]);
 			}
 
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 4 / limit; i++)
 			{
 				SpawnMP(parties[5]);
 			}
@@ -120,7 +131,7 @@ public class PartyManager : MonoBehaviour
 		}
 		else
 		{
-			for (int i = 0; i < partyRelatedTweets.Count; i++)
+			for (int i = 0; i < partyRelatedTweets.Count / limit; i++)
 			{
 				SpawnMP (partyRelatedTweets[i].party);
 			}
@@ -182,6 +193,7 @@ public class PartyManager : MonoBehaviour
 		
 		GameObject mp = Instantiate (mpPrefab, position, mpPrefab.transform.rotation) as GameObject;
 		mp.GetComponent<MP_Control> ().Party = party.name;
+		mp.GetComponent<MP_Control> ().party = party;
 		mp.GetComponentInChildren<PunchedDamage>().Party = party.name;
 
 		foreach (PunchForce pf in mp.GetComponentsInChildren<PunchForce>())
@@ -205,24 +217,25 @@ public class PartyManager : MonoBehaviour
 		return mp;
 	}
 
-	public void RemoveMPFromParty(GameObject mp)
+	public void RemoveMPFromParty(GameObject mp, Party party)
 	{
 		int partiesWithRemainingMPs = 0;
 
+		party.mps.Remove (mp);
+
+		try
+		{
+			GameObject death = Instantiate (deathEffect, mp.transform.FindChild ("HeadTarget").transform.position, Quaternion.identity) as GameObject;
+			death.transform.SetParent (gameManager.dynamicObjectHolder.transform);
+			death.GetComponent<ParticleSystem>().startColor = GetParty (mp.GetComponent<MP_Control>().Party).colour;
+		}
+		catch {}
+
 		foreach (Party p in parties)
 		{
-			p.mps.Remove (mp);
-
 			if (p.mps.Count > 0)
 				partiesWithRemainingMPs++;
 
-			try
-			{
-				GameObject death = Instantiate (deathEffect, mp.transform.FindChild ("HeadTarget").transform.position, Quaternion.identity) as GameObject;
-				death.transform.SetParent (gameManager.dynamicObjectHolder.transform);
-				death.GetComponent<ParticleSystem>().startColor = GetParty (mp.GetComponent<MP_Control>().Party).colour;
-			}
-			catch {}
 			//Update GUI
 			gameManager.guimMainGame.UpdateScoreCard (p);
 		}
@@ -234,18 +247,12 @@ public class PartyManager : MonoBehaviour
 		}
 	}
 
-	public void SpawnHitMarker(string party, Vector3 position)
+	public void SpawnHitMarker(Party party, Vector3 position)
 	{
-		foreach (Party p in parties)
+		if (hitEffects.Length > 0)
 		{
-			if (party == p.name)
-			{
-				if (hitEffects.Length > 0)
-				{
-					GameObject g = Instantiate(hitEffects[Random.Range (0, hitEffects.Length)], position, Quaternion.identity) as GameObject;
-					g.GetComponent<Renderer>().material.color = p.colour;
-				}
-			}
+			GameObject g = Instantiate(hitEffects[Random.Range (0, hitEffects.Length)], position, Quaternion.identity) as GameObject;
+			g.GetComponent<Renderer>().material.color = party.colour;
 		}
 	}
 
@@ -264,14 +271,19 @@ public class PartyManager : MonoBehaviour
 	{
 		StartCoroutine (FindObjectOfType<Order> ().ShowSign ());
 
-		foreach (Party p in parties)
+		if (lastOrder < Time.time - 2.5f)
 		{
-			for (int i = 0; i < p.mps.Count; i++)
+			lastOrder = Time.time;
+
+			foreach (Party p in parties)
 			{
-				if (p.mps[i] != null)
+				for (int i = 0; i < p.mps.Count; i++)
 				{
-					//Home.transform.position - transform.position).normalized * 30000
-					p.mps[i].GetComponent<MP_Control>().AddForce ((p.seats[Random.Range (0, p.seats.Count)].transform.position - transform.position).normalized * 30000);
+					if (p.mps[i] != null)
+					{
+						//Home.transform.position - transform.position).normalized * 30000
+						p.mps[i].GetComponent<MP_Control>().AddForce ((p.seats[Random.Range (0, p.seats.Count)].transform.position - transform.position).normalized * 30000);
+					}
 				}
 			}
 		}
@@ -288,7 +300,7 @@ public class PartyManager : MonoBehaviour
 					if (Vector3.Distance (p.mps[i].transform.position, boundsCentre) > maxBoundsDistace)
 					{
 						Debug.Log (p.mps[i] + " is out of bounds. Destroyed.");
-						RemoveMPFromParty (p.mps[i]);
+						RemoveMPFromParty (p.mps[i], p);
 						i--;
 					}
 				}
